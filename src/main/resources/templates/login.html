@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>GroovMaker / Login</title>
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/welcome}">Welcome</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" th:href="@{/home}">Home</a>
+            </li>
+        </ul>
+    </div>
+    <div class="mx-auto order-0">
+        <a class="navbar-brand mx-auto" th:href="@{/welcome}">GroovMaker</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/login}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/register}">Sign up</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+        <H1>Login to GroovMaker!</H1>
+        <div class="card">
+            <article class="card-body ">
+
+                <h3 class="card-title mb-4 mt-1">Sign in</h3>
+                <form th:action="@{/login}" method="POST" >
+                    <div class="form-group">
+                        <label>Your email</label>
+                        <input name="email" class="form-control" placeholder="Email" type="email" id="email">
+                    </div> <!-- form-group// -->
+                    <div class="form-group">
+                        <label>Your password</label>
+                        <input class="form-control" placeholder="******" type="password" name="password" id="password">
+                    </div> <!-- form-group// -->
+                    <div class="form-group">
+                    </div> <!-- form-group// -->
+                    <div align="center" th:if="${param.error}">
+                        <p style="font-size: 20; color: #FF1C19;">Email or Password incorrect</p>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block"> Login  </button>
+                    </div> <!-- form-group// -->
+                </form>
+                <div align="center">
+                    <p style="font-size: 20; color: #3441ff;">Don't have an account yet?</p>
+                </div>
+                <form th:action="@{/register}" method="get">
+                    <button class="btn btn-success btn-block" type="Submit">Sign up</button>
+                </form>
+            </article>
+        </div> <!-- card.// -->
+</div>
+</body>
+</html>
