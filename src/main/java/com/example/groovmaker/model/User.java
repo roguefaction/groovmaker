@@ -1,8 +1,5 @@
 package com.example.groovmaker.model;
 
-
-import lombok.Builder;
-import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -10,11 +7,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
-
-@Data  // automatiskai sugeneruojami boiler plate metodai (getters, setters, etc)
-@Builder  // automatiskai sukurtas builder patternas klasei
-//@AllArgsConstructor  // automatiskai sukurtas construktorius su visais params
-//@NoArgsConstructor  // automatiskai sukurtas construktorius be params
 @Entity
 @Table
 public class User {

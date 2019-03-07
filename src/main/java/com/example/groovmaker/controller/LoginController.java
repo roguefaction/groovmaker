@@ -78,24 +78,29 @@ public class LoginController {
 
         // welcome objects added to displaying page
         modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
+        modelAndView.addObject("adminMessage", "Content Available Only for Users with Admin Role");
         modelAndView.addObject("username", user.getName());
-        modelAndView.addObject("adminMessage","Content Available Only for Users with Admin Role");
+
         modelAndView.setViewName("admin/home");
 
         return modelAndView;
     }
 
-    @GetMapping(value = {"/","/welcome"})
-    public ModelAndView welcome(){
+    @GetMapping(value = {"/", "/welcome"})
+    public ModelAndView welcome() {
         ModelAndView modelAndView = new ModelAndView();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findUserByEmail(authentication.getName());
+        if (user != null){
+
+            modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
+            modelAndView.addObject("adminMessage", "Content Available Only for Users with Admin Role");
+            modelAndView.setViewName("admin/home");
+            return modelAndView;
+        }
+
         modelAndView.setViewName("welcome");
-
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = userService.findUserByEmail(authentication.getName());
-//        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
-//
-
-
         return modelAndView;
     }
 
