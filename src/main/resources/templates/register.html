@@ -47,30 +47,39 @@
 
 
 <div class="container">
-    <H1>Register to GroovMaker!</H1>
-    <div class="card">
+    <H1 class="pt-3 pb-3">Register to GroovMaker!</H1>
+    <div class="card  mb-4 mt-1">
         <article class="card-body ">
 
             <h3 class="card-title mb-4 mt-1">Sign Up</h3>
 
-            <form form autocomplete="off" action="#" th:action="@{/register}" method="POST" th:object="${user}">
+            <form autocomplete="off" action="#" th:action="@{/register}" method="POST" th:object="${user}">
 
                 <div class="form-group">
-                    <label th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
-                            class="validation-message"></label>
-                    <input name="email" class="form-control text-danger" placeholder="Email" type="email" id="email" th:field="*{email}">
+                    <label for="email" class="form-label col-ld-1">Email</label>
+                    <input name="email" class="form-control " placeholder="Email" type="text" id="email"
+                           th:field="*{email}" maxlength="50">
+                    <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+                           class="validation-message text-danger">
+                    </small>
                 </div> <!-- form-group// -->
 
                 <div class="form-group">
-                    <label th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
-                           class="validation-message text-danger" ></label>
-                    <input name="name" class="form-control" placeholder="Name" id="name" type="text" th:field="*{name}">
+                    <label for="name" class="form-label col-ld-1">Name</label>
+                    <input name="name" class="form-control" placeholder="Name" id="name" type="text"
+                           th:field="*{name}" maxlength="50">
+                    <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+                           class="validation-message text-danger">
+                    </small>
                 </div> <!-- form-group// -->
 
                 <div class="form-group">
-                    <label th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
-                            class="validation-message text-danger"></label>
-                    <input class="form-control" placeholder="******" type="password" name="password" id="password" th:field="*{password}">
+                    <label for="password" class="form-label col-ld-1">Password</label>
+                    <input name="password" class="form-control" placeholder="******" id="password" type="password"
+                           th:field="*{password}" maxlength="50">
+                    <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                           class="validation-message text-danger">
+                    </small>
                 </div> <!-- form-group// -->
 
                 <div class="form-group">

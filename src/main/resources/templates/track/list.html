@@ -13,6 +13,8 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="../../static/css/js/scripts.js"></script>
 </head>
 <body>
 
@@ -25,7 +27,7 @@
             <li class="nav-item ">
                 <a class="nav-link" th:href="@{/admin/home}">Home</a>
             </li>
-            <li class="nav-item ">
+            <li class="nav-item active">
                 <a class="nav-link" th:href="@{/tracks}">Track List</a>
             </li>
         </ul>
@@ -52,9 +54,14 @@
 </nav>
 
 <div class="container">
-    <H1>Here is a list of every track</H1>
+    <H1 class="pt-3 pb-3">Here is a list of every track</H1>
 
     <div class="card">
+
+        <div class="validation-message text-danger">
+            <p class="admin-message-text text-center" th:utext="${message}"></p>
+        </div>
+
         <article class="card-body ">
 
             <div class="container">
@@ -67,7 +74,7 @@
                         <tr>
                             <th scope="col">Title</th>
                             <th scope="col">Artist</th>
-                            <th scope="col">Description</th>
+                            <th scope="col">Genre</th>
                             <th scope="col">Show</th>
                             <th scope="col">Edit</th>
                             <th scope="col">Delete</th>
@@ -77,7 +84,7 @@
                         <tr  th:each="track : ${tracks}">
                             <th scope="row" th:text="${track.title}"></th>
                             <td th:text="${track.artist}"></td>
-                            <td th:text="${track.description}"></td>
+                            <td th:text="${track.genre}"></td>
                             <td>
                                 <form th:action="@{/track/{id}/(id=${track.id})}" method="get">
                                     <button class="btn btn-primary btn-block" type="Submit">Show</button>
@@ -90,7 +97,7 @@
                             </td>
                             <td>
                                 <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}" method="get">
-                                    <button class="btn btn-danger btn-block" type="Submit">Delete</button>
+                                    <button class="btn btn-danger btn-block" type="Submit" th:onclick="return confirm('Are you sure?')" >Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -104,9 +111,9 @@
         </article>
     </div> <!-- card.// -->
 
-    <div class="container">
+    <div class="container pt-1 pt-3 pb-3">
         <form th:action="@{/track/create}" method="get">
-            <button class="btn btn-primary btn-block pt-1" type="Submit">Upload a Track</button>
+            <button  class="btn btn-primary btn-block " type="Submit">Upload a Track</button>
         </form>
     </div>
 

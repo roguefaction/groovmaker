@@ -59,29 +59,75 @@
 
             <h3 class="card-title mb-4 mt-1">Update the form</h3>
 
-            <form autocomplete="off" action="#" th:action="@{/track/{path}/(path=${track.id})}" method="Post" th:object="${track}">
+            <form autocomplete="off" action="#" th:action="@{/track/{path}/(path=${track.id})}" method="Post"
+                  th:object="${track}" enctype="multipart/form-data">
 
                 <div class="form-group">
-                    <label th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
-                           class="validation-message text-danger"></label>
-                    <input name="title" class="form-control" placeholder="Title" type="text" id="title" th:field="*{title}">
+                    <label for="title" class="form-label col-ld-1">Title</label>
+                    <input name="title" class="form-control " placeholder="Title" type="text" id="title"
+                           th:field="*{title}" th:value="*{title}">
+                    <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
+                           class="validation-message text-danger">
+                    </small>
                 </div> <!-- form-group// -->
 
                 <div class="form-group">
-                    <label th:if="${#fields.hasErrors('artist')}" th:errors="*{artist}"
-                           class="validation-message text-danger" ></label>
-                    <input name="artist" class="form-control" placeholder="Artist" id="artist" type="text" th:field="*{artist}">
+                    <label for="artist" class="form-label col-ld-1">Artist</label>
+                    <input name="artist" class="form-control" placeholder="Artist" id="artist" type="text"
+                           th:field="*{artist}" th:value="*{artist}">
+                    <small th:if="${#fields.hasErrors('artist')}" th:errors="*{artist}"
+                           class="validation-message text-danger">
+                    </small>
                 </div> <!-- form-group// -->
 
                 <div class="form-group">
-                    <label th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
-                           class="validation-message text-danger"></label>
-                    <input class="form-control" placeholder="Description" type="text" name="description" id="description" th:field="*{description}">
+                    <label for="genre" class="form-label col-ld-1">Genre</label>
+                    <select class="form-control" id="genre" name="genre" th:value="*{genre}">
+                        <option></option>
+                        <option>Jazz</option>
+                        <option>Folk</option>
+                        <option>Electronic</option>
+                        <option>Rock</option>
+                        <option>Rap or Hip/Hop</option>
+                    </select>
+                    <small th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}"
+                           class="validation-message text-danger">
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="imageUrl" class="form-label col-ld-1">Image URL</label>
+                    <input name="imageUrl" class="form-control" placeholder="Copy and Paste the image url here"
+                           id="imageUrl" type="text"
+                           th:field="*{imageUrl}" th:value="*{imageUrl}">
+                    <small th:if="${#fields.hasErrors('imageUrl')}" th:errors="*{imageUrl}"
+                           class="validation-message text-danger">
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label col-ld-1">Description</label>
+                    <textarea class="form-control" placeholder="Description" name="description"
+                              id="description" th:field="*{description}" rows="4" th:value="*{description}"></textarea>
+                    <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+                           class="validation-message text-danger">
+                    </small>
                 </div> <!-- form-group// -->
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-success btn-block"> Submit </button>
+                    <label for="file" class="form-label col-ld-1">File</label>
+                    <input class="form-control-file" placeholder="File" type="file" name="file" id="file">
+
+                    <small th:utext="${fileMessage}"
+                           class="validation-message text-danger">
+                    </small>
+                </div>
+
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block"> Submit changes</button>
                 </div> <!-- form-group// -->
+
 
             </form>
             <form th:action="@{/admin/home}" method="get">

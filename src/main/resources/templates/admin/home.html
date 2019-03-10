@@ -6,6 +6,8 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
+    <link rel="stylesheet" href="../../static/css/css/forms.css">
+
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -14,6 +16,7 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
 </head>
 
 <body>
@@ -24,9 +27,9 @@
                 <a class="nav-link" th:href="@{/welcome}">Welcome</a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" th:href="@{/admin/home}">Home</a>
+                <a class="nav-link active" th:href="@{/admin/home}">Home</a>
             </li>
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" th:href="@{/tracks}">Track List</a>
             </li>
         </ul>

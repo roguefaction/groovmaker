@@ -52,65 +52,69 @@
 </nav>
 
 <div class="container">
-    <H1>Here is your track</H1>
+    <H1 class="pt-3 pb-3">Here is your track</H1>
     <div class="card">
-        <article class="card-body ">
+        <article class="card-body mb-4 mt-1 d-flex justify-content-center">
+
+            <form th:object="${track}">
 
                 <div class="form-group">
-                    <h1>
-                        Track title:
-                    </h1>
-                    <h3 th:utext="*{track.title}">
+                    <img th:src="*{imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
+                         th:alt="*{imageUrl}">
+                </div>
 
-                    </h3>
+                <div class="form-group">
+                    <label for="title" class="form-label col-ld-1">Title</label>
+                    <input name="title" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="title"
+                           th:field="*{title}">
                 </div> <!-- form-group// -->
 
-            <div class="form-group">
-                <h1>
-                    Track artist:
-                </h1>
-                <h3 th:utext="*{track.artist}">
+                <div class="form-group">
+                    <label for="artist" class="form-label col-ld-1">Artist</label>
+                    <input name="artist" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text"
+                           id="artist"
+                           th:field="*{artist}">
+                </div> <!-- form-group// -->
 
-                </h3>
-            </div> <!-- form-group// -->
-
-            <div class="form-group">
-                <h1>
-                    Track title:
-                </h1>
-                <h3 th:utext="*{track.description}">
-
-                </h3>
-            </div> <!-- form-group// -->
-
-            <div class="form-group">
-                <h1>
-                    Track fileName:
-                </h1>
-                <h3 th:utext="*{track.fileUrl}">
-
-                </h3>
-            </div> <!-- form-group// -->
-
-            <form  th:action="@{/track/download/{filename}(filename=${track.fileUrl})}" method="get">
-                <button class="btn btn-primary btn-block" type="Submit">Download</button>
-            </form>
+                <div class="form-group">
+                    <label for="genre" class="form-label col-ld-1">Genre</label>
+                    <input name="genre" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="genre"
+                           th:field="*{genre}">
+                </div>
 
 
-            <form  th:action="@{/track/{path}/edit(path=${track.id})}" method="get">
-                <button class="btn btn-primary btn-block" type="Submit">Edit this track</button>
-            </form>
+                <div class="form-group">
+                    <label for="description" class="form-label col-ld-1">Description</label>
+                    <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text" readonly  id="description"
+                              th:field="*{description}" rows="4"></textarea>
+                </div> <!-- form-group// -->
 
-                <br>
-
-            <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get">
-                <button class="btn btn-danger btn-block" type="Submit">Delete this track</button>
             </form>
 
         </article>
     </div> <!-- card.// -->
-</div>
 
+        <br>
+
+        <form th:action="@{/track/download/{filename}(filename=${track.fileUrl})}" method="get">
+            <button class="btn btn-success btn-block" type="Submit">Download</button>
+        </form>
+
+        <br>
+
+        <form th:action="@{/track/{path}/edit(path=${track.id})}" method="get">
+            <button class="btn btn-primary btn-block" type="Submit">Edit this track</button>
+        </form>
+
+        <br>
+
+        <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get">
+            <button class="btn btn-danger btn-block" type="Submit">Delete this track</button>
+        </form>
+
+
+
+</div>
 
 
 </body>

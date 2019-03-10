@@ -41,7 +41,7 @@
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link"  th:href="@{/login}">Login</a>
+                <a class="nav-link" th:href="@{/login}">Login</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">lalallalala</a>
@@ -53,10 +53,28 @@
     </div>
 </nav>
 <div class="container">
-    <h3>Welcome to GroovMaker</h3>
-    <a class="text-lg-left"  th:href="@{/login}">Login</a>
-    or
-    <a class="text-lg-left" th:href="@{/register}">Sign up</a>
+    <h1 class="pt-3 pb-3">Welcome to GroovMaker</h1>
+    <!--<div class="d-flex justify-content-center  mb-4 mt-1">-->
+    <!--<a class="text-lg-left"  th:href="@{/login}">Login</a>-->
+    <!--or-->
+    <!--<a class="text-lg-left" th:href="@{/register}">Sign up</a>-->
+    <!--</div>-->
+
+    <p>
+        Here are some things you can do:
+    </p>
+
+    <br>
+
+    <form th:action="@{/login}" method="get">
+        <button class="btn btn-primary btn-block" type="Submit">Login</button>
+    </form>
+
+    <br>
+
+    <form th:action="@{/register}" method="get">
+        <button class="btn btn-success btn-block" type="Submit">Sign up</button>
+    </form>
 
 </div>
 </body>

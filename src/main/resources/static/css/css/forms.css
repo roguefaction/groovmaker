@@ -12,3 +12,7 @@
     left: auto !important;
     right: 0px;
 }
+
+.bigger-text{
+    font-size: 2rem;
+}
