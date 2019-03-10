@@ -19,6 +19,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
+
     //default site view and login view
     @GetMapping(value = "/login")
     public ModelAndView login() {
@@ -92,7 +93,7 @@ public class LoginController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(authentication.getName());
-        if (user != null){
+        if (user != null) {
 
             modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
             modelAndView.addObject("adminMessage", "Content Available Only for Users with Admin Role");

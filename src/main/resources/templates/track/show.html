@@ -83,6 +83,19 @@
                 </h3>
             </div> <!-- form-group// -->
 
+            <div class="form-group">
+                <h1>
+                    Track fileName:
+                </h1>
+                <h3 th:utext="*{track.fileUrl}">
+
+                </h3>
+            </div> <!-- form-group// -->
+
+            <form  th:action="@{/track/download/{filename}(filename=${track.fileUrl})}" method="get">
+                <button class="btn btn-primary btn-block" type="Submit">Download</button>
+            </form>
+
 
             <form  th:action="@{/track/{path}/edit(path=${track.id})}" method="get">
                 <button class="btn btn-primary btn-block" type="Submit">Edit this track</button>

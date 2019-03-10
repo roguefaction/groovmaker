@@ -1,15 +1,21 @@
 package com.example.groovmaker.controller;
 
+import com.example.groovmaker.exception.StorageFileNotFoundException;
 import com.example.groovmaker.model.Track;
 import com.example.groovmaker.model.User;
+import com.example.groovmaker.service.StorageService;
 import com.example.groovmaker.service.TrackService;
 import com.example.groovmaker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -21,11 +27,15 @@ public class TrackController {
 
     private TrackService trackService;
     private UserService userService;
+    private StorageService storageService;
+
 
     @Autowired
-    public TrackController(TrackService trackService, UserService userService) {
+    public TrackController(TrackService trackService, UserService userService, StorageService storageService) {
         this.trackService = trackService;
         this.userService = userService;
+        this.storageService = storageService;
+
     }
 
     @GetMapping(value = "/track/{id}")
@@ -44,14 +54,16 @@ public class TrackController {
     }
 
     @PostMapping(value = "/track/create")
-    public ModelAndView createTrack(@Valid Track track, BindingResult bindingResult) {
+    public ModelAndView createTrack(@Valid Track track, @RequestParam("file") MultipartFile file, BindingResult bindingResult) {
 
         ModelAndView modelAndView = new ModelAndView();
 
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("track/create");
         } else {
+            track.setFileUrl(file.getOriginalFilename());
             trackService.createTrack(track);
+            storageService.store(file);
 
             ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
             newModelAndView.addObject("track", track);
@@ -128,7 +140,7 @@ public class TrackController {
 
 
     @GetMapping(value = "/tracks")
-    public ModelAndView getAllTracks(){
+    public ModelAndView getAllTracks() {
         ModelAndView modelAndView = new ModelAndView();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -141,6 +153,21 @@ public class TrackController {
         modelAndView.addObject("tracks", listOfTracks);
 
         return modelAndView;
+    }
+
+
+    @GetMapping("/track/download/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+
+        Resource file = storageService.loadAsResource(filename);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    }
+
+    @ExceptionHandler(StorageFileNotFoundException.class)
+    public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
+        return ResponseEntity.notFound().build();
     }
 
 
