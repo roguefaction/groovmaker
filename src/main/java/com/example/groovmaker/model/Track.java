@@ -1,5 +1,7 @@
 package com.example.groovmaker.model;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
@@ -15,15 +17,17 @@ public class Track implements Serializable {
     private int id;
 
     @Column(name = "artist")
-    @NotEmpty(message = "Please enter the artist name")
+    @Length(min = 3, max = 50, message = "Artists must be between 3 to 50 characters")
+    @NotEmpty(message = "Please enter the artist")
     private String artist;
 
     @Column(name = "title")
+    @Length(min = 3, max = 50, message = "Title must be between 3 to 50 characters")
     @NotEmpty(message = "Please enter the title")
     private String title;
 
     @Column(name = "description")
-    @NotEmpty(message = "Please enter the description")
+    @Length(max = 500, message = "Description must be up to 500 characters long")
     private String description;
 
     @Column(name = "genre")

@@ -9,6 +9,7 @@ import com.example.groovmaker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -35,7 +37,6 @@ public class TrackController {
         this.trackService = trackService;
         this.userService = userService;
         this.storageService = storageService;
-
     }
 
     @GetMapping(value = "/track/{id}")
@@ -54,44 +55,53 @@ public class TrackController {
     }
 
     @PostMapping(value = "/track/create")
-    public ModelAndView createTrack(@Valid Track track, @RequestParam("file") MultipartFile file, BindingResult bindingResult) {
+    public ModelAndView createTrack(@Valid Track track, BindingResult bindingResult, @RequestParam(value = "file") MultipartFile file) {
 
         ModelAndView modelAndView = new ModelAndView();
 
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("track/create");
         } else {
-            track.setFileUrl(file.getOriginalFilename());
-            trackService.createTrack(track);
-            storageService.store(file);
+            if (file.isEmpty()) {
+                modelAndView.setViewName("track/create");
+                modelAndView.addObject("fileMessage", "Please choose a file");
+            } else {
+                track.setFileUrl(file.getOriginalFilename());
+                trackService.createTrack(track);
+                storageService.store(file);
 
-            ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
-            newModelAndView.addObject("track", track);
-            return newModelAndView;
-
+                ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
+                newModelAndView.addObject("track", track);
+                return newModelAndView;
+            }
         }
         return modelAndView;
     }
 
     @GetMapping(value = "/track/{id}/delete")
-    public ModelAndView deleteTrackById(@PathVariable("id") int id) {
-        ModelAndView modelAndView = new ModelAndView();
-        trackService.deleteTrackById(id);
-
+    public String deleteTrackById(@PathVariable("id") int id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(authentication.getName());
 
-        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
-        modelAndView.addObject("message", "The track has been successfully deleted");
-        modelAndView.setViewName("admin/home");
-        return modelAndView;
+        Track track = trackService.getTrackById(id);
+
+        if(user.getId() == track.getUploaderId())
+            trackService.deleteTrackById(id);
+        else
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only uploading user can delete this track");
+
+        return "redirect:/tracks";
     }
 
     @PostMapping(value = "/track/{id}")
-    public ModelAndView updateTrack(@PathVariable("id") int id, @Valid Track track, BindingResult bindingResult) {
+    public ModelAndView updateTrack(@PathVariable("id") int id, @Valid Track track, BindingResult bindingResult, @RequestParam(value = "file", required = false) MultipartFile file) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(authentication.getName());
+
+        Track checkTrack = trackService.getTrackById(id);
+        if(user.getId() != checkTrack.getUploaderId())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only uploading user can edit this track");
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
@@ -99,12 +109,26 @@ public class TrackController {
 
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("track/edit");
-        } else {
-            Track updatedTrack = trackService.updateTrackById(id, track);
 
-            ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + updatedTrack.getId());
-            newModelAndView.addObject("track", updatedTrack);
-            return newModelAndView;
+        } else {
+            if (file.isEmpty()) {
+                trackService.updateTrackById(id, track);
+                ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
+                newModelAndView.addObject("track", track);
+                return newModelAndView;
+
+            } else {
+
+                track.setFileUrl(file.getOriginalFilename());
+                storageService.store(file);
+                trackService.updateTrackById(id, track);
+
+                ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
+                newModelAndView.addObject("track", track);
+                return newModelAndView;
+
+            }
+
         }
         return modelAndView;
     }
@@ -128,7 +152,6 @@ public class TrackController {
         User user = userService.findUserByEmail(authentication.getName());
 
         Track track = trackService.getTrackById(id);
-
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
@@ -154,7 +177,6 @@ public class TrackController {
 
         return modelAndView;
     }
-
 
     @GetMapping("/track/download/{filename:.+}")
     @ResponseBody

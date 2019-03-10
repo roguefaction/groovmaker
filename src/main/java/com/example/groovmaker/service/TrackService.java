@@ -45,6 +45,10 @@ public class TrackService {
             updatedTrack.setTitle(track.getTitle());
             updatedTrack.setArtist(track.getArtist());
             updatedTrack.setDescription(track.getDescription());
+            updatedTrack.setGenre(track.getGenre());
+            updatedTrack.setImageUrl(track.getImageUrl());
+            if (track.getFileUrl() != null)
+                updatedTrack.setFileUrl(track.getFileUrl());
 
             return trackRepository.save(updatedTrack);
 
