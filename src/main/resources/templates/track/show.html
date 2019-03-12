@@ -23,7 +23,7 @@
                 <a class="nav-link" th:href="@{/welcome}">Welcome</a>
             </li>
             <li class="nav-item ">
-                <a class="nav-link" th:href="@{/admin/home}">Home</a>
+                <a class="nav-link" th:href="@{/user/home}">Home</a>
             </li>
             <li class="nav-item ">
                 <a class="nav-link" th:href="@{/tracks}">Track List</a>
@@ -39,13 +39,10 @@
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" th:utext="${WelcomeUser}"></a>
+                <a class="nav-link" th:utext="'Welcome, ' + ${user.getName()}"></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/logout}">Logout</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">lalallalala</a>
             </li>
         </ul>
     </div>
@@ -54,42 +51,51 @@
 <div class="container">
     <H1 class="pt-3 pb-3">Here is your track</H1>
     <div class="card">
-        <article class="card-body mb-4 mt-1 d-flex justify-content-center">
+        <article class="card-body mb-4 mt-1">
 
-            <form th:object="${track}">
+            <form th:object="${track}" class="row">
 
-                <div class="form-group">
-                    <img th:src="*{imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
-                         th:alt="*{imageUrl}">
+                <div class="container col-9">
+
+                    <div class="form-group">
+                        <label for="title" class="form-label col-ld-1">Title</label>
+                        <input name="title" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="title"
+                               th:field="*{title}">
+                    </div> <!-- form-group// -->
+
+                    <div class="form-group">
+                        <label for="artist" class="form-label col-ld-1">Artist</label>
+                        <input name="artist" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text"
+                               id="artist"
+                               th:field="*{artist}">
+                    </div> <!-- form-group// -->
+
+                    <div class="form-group">
+                        <label for="genre" class="form-label col-ld-1">Genre</label>
+                        <input name="genre" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="genre"
+                               th:field="*{genre}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="description" class="form-label col-ld-1">Description</label>
+                        <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text" readonly disabled id="description"
+                                  th:field="*{description}" rows="4"></textarea>
+                    </div> <!-- form-group// -->
+
                 </div>
 
-                <div class="form-group">
-                    <label for="title" class="form-label col-ld-1">Title</label>
-                    <input name="title" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="title"
-                           th:field="*{title}">
-                </div> <!-- form-group// -->
+                <div class="container col-3">
 
-                <div class="form-group">
-                    <label for="artist" class="form-label col-ld-1">Artist</label>
-                    <input name="artist" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text"
-                           id="artist"
-                           th:field="*{artist}">
-                </div> <!-- form-group// -->
+                    <div class="form-group">
+                        <img th:src="*{imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
+                             th:alt="*{imageUrl}">
+                    </div>
 
-                <div class="form-group">
-                    <label for="genre" class="form-label col-ld-1">Genre</label>
-                    <input name="genre" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="genre"
-                           th:field="*{genre}">
                 </div>
-
-
-                <div class="form-group">
-                    <label for="description" class="form-label col-ld-1">Description</label>
-                    <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text" readonly disabled id="description"
-                              th:field="*{description}" rows="4"></textarea>
-                </div> <!-- form-group// -->
 
             </form>
+
 
         </article>
     </div> <!-- card.// -->

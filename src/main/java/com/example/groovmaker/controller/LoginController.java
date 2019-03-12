@@ -32,11 +32,11 @@ public class LoginController {
 
     @GetMapping(value = "/register")
     public ModelAndView register() {
-
         ModelAndView modelAndView = new ModelAndView();
+
         User user = new User();
 
-        // user object added to displaying page (?)
+        // user object added to displaying page
         modelAndView.addObject("user", user);
         modelAndView.setViewName("register");
         return modelAndView;
@@ -69,21 +69,18 @@ public class LoginController {
         return modelAndView;
     }
 
-    @GetMapping(value = "admin/home")
+    @GetMapping(value = "/user/home")
     public ModelAndView home() {
         ModelAndView modelAndView = new ModelAndView();
 
         // get current users name from auth object
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
+        User user = getAuth();
 
         // welcome objects added to displaying page
-        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
-        modelAndView.addObject("adminMessage", "Content Available Only for Users with Admin Role");
-        modelAndView.addObject("username", user.getName());
+        modelAndView.addObject(user);
+        modelAndView.addObject("userMessage", "Content Available Only for Users with User Role");
 
-        modelAndView.setViewName("admin/home");
-
+        modelAndView.setViewName("user/home");
         return modelAndView;
     }
 
@@ -91,18 +88,24 @@ public class LoginController {
     public ModelAndView welcome() {
         ModelAndView modelAndView = new ModelAndView();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
+        User user = getAuth();
+
         if (user != null) {
 
-            modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
-            modelAndView.addObject("adminMessage", "Content Available Only for Users with Admin Role");
-            modelAndView.setViewName("admin/home");
+            modelAndView.addObject(user);
+            modelAndView.addObject("userMessage", "Content Available Only for Users with User Role");
+            modelAndView.setViewName("user/home");
             return modelAndView;
         }
 
         modelAndView.setViewName("welcome");
         return modelAndView;
+    }
+
+
+    private User getAuth(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.findUserByEmail(authentication.getName());
     }
 
 

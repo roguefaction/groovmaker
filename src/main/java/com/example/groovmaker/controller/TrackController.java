@@ -39,19 +39,17 @@ public class TrackController {
         this.storageService = storageService;
     }
 
+
     @GetMapping(value = "/track/{id}")
     public ModelAndView getTrackById(@PathVariable("id") int id) {
         Track track = trackService.getTrackById(id);
         ModelAndView modelAndView = new ModelAndView();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
-
-        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
+        User user = getAuth();
 
         modelAndView.addObject(user);
         modelAndView.setViewName("track/show");
-        modelAndView.addObject("track", track);
+        modelAndView.addObject(track);
         return modelAndView;
     }
 
@@ -60,8 +58,7 @@ public class TrackController {
 
         ModelAndView modelAndView = new ModelAndView();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
+        User user = getAuth();
 
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("track/create");
@@ -85,12 +82,12 @@ public class TrackController {
 
     @GetMapping(value = "/track/{id}/delete")
     public String deleteTrackById(@PathVariable("id") int id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
+
+        User user = getAuth();
 
         Track track = trackService.getTrackById(id);
 
-        if(user.getId() == track.getUploaderId())
+        if (user.getId() == track.getUploaderId())
             trackService.deleteTrackById(id);
         else
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only uploading user can delete this track");
@@ -101,16 +98,15 @@ public class TrackController {
     @PostMapping(value = "/track/{id}")
     public ModelAndView updateTrack(@PathVariable("id") int id, @Valid Track track, BindingResult bindingResult, @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
+        User user = getAuth();
 
         Track checkTrack = trackService.getTrackById(id);
-        if(user.getId() != checkTrack.getUploaderId())
+        if (user.getId() != checkTrack.getUploaderId())
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only uploading user can edit this track");
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
+        modelAndView.addObject(user);
 
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("track/edit");
@@ -119,19 +115,17 @@ public class TrackController {
             if (file.isEmpty()) {
                 trackService.updateTrackById(id, track);
                 ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
-                newModelAndView.addObject("track", track);
+                newModelAndView.addObject(track);
                 return newModelAndView;
 
             } else {
-
                 track.setFileUrl(file.getOriginalFilename());
                 storageService.store(file);
                 trackService.updateTrackById(id, track);
 
                 ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
-                newModelAndView.addObject("track", track);
+                newModelAndView.addObject(track);
                 return newModelAndView;
-
             }
 
         }
@@ -140,30 +134,31 @@ public class TrackController {
 
     @GetMapping(value = "/track/create")
     public ModelAndView createTrackPage() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
+
+        User user = getAuth();
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("track", new Track());
-        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
+        modelAndView.addObject(user);
         modelAndView.setViewName("track/create");
         return modelAndView;
     }
 
     @GetMapping(value = "/track/{id}/edit")
     public ModelAndView editTrackPage(@PathVariable("id") int id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
+
+        User user = getAuth();
 
         Track track = trackService.getTrackById(id);
         track.setUploaderId(user.getId());
+
         trackService.getTrackById(id);
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("track", track);
-        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
+        modelAndView.addObject(track);
+        modelAndView.addObject(user);
         modelAndView.setViewName("track/edit");
         return modelAndView;
     }
@@ -173,17 +168,12 @@ public class TrackController {
     public ModelAndView getAllTracks() {
         ModelAndView modelAndView = new ModelAndView();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findUserByEmail(authentication.getName());
-
-
-
+        User user = getAuth();
 
         List<Track> listOfTracks = trackService.getAllTracks();
 
         modelAndView.setViewName("track/list");
         modelAndView.addObject(user);
-        modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
         modelAndView.addObject("tracks", listOfTracks);
 
         return modelAndView;
@@ -203,6 +193,11 @@ public class TrackController {
         return ResponseEntity.notFound().build();
     }
 
+
+    private User getAuth() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.findUserByEmail(authentication.getName());
+    }
 
 }
 

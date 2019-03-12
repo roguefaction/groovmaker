@@ -23,7 +23,7 @@
                 <a class="nav-link" th:href="@{/welcome}">Welcome</a>
             </li>
             <li class="nav-item ">
-                <a class="nav-link" th:href="@{/admin/home}">Home</a>
+                <a class="nav-link" th:href="@{/user/home}">Home</a>
             </li>
             <li class="nav-item ">
                 <a class="nav-link" th:href="@{/tracks}">Track List</a>
@@ -39,13 +39,10 @@
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" th:utext="${WelcomeUser}"></a>
+                <a class="nav-link" th:utext="'Welcome, ' + ${user.getName()}"></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/logout}">Logout</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">lalallalala</a>
             </li>
         </ul>
     </div>
@@ -130,7 +127,7 @@
 
 
             </form>
-            <form th:action="@{/admin/home}" method="get">
+            <form th:action="@{/user/home}" method="get">
                 <button class="btn btn-primary btn-block" type="Submit">Back to Home</button>
             </form>
         </article>

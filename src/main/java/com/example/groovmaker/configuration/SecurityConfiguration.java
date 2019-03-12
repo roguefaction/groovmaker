@@ -52,13 +52,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/register").permitAll()
                 .antMatchers("/welcome").permitAll()
 
-                // su admin autorizacija
-                .antMatchers("/admin/**","/track","/tracks").hasAuthority("ADMIN").anyRequest()
+                // su user autorizacija
+                .antMatchers("/user/**","/track","/tracks").hasAuthority("USER").anyRequest()
                 .authenticated().and().csrf().disable().formLogin()
                 .loginPage("/login").failureUrl("/login?error=true")
 
                 // nuroutinimas sekmingai prisijungus
-                .defaultSuccessUrl("/admin/home")
+                .defaultSuccessUrl("/user/home")
                 .usernameParameter("email")
                 .passwordParameter("password")
                 .and().logout()
