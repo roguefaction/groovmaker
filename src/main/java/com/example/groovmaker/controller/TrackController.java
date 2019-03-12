@@ -49,6 +49,7 @@ public class TrackController {
 
         modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
 
+        modelAndView.addObject(user);
         modelAndView.setViewName("track/show");
         modelAndView.addObject("track", track);
         return modelAndView;
@@ -59,6 +60,9 @@ public class TrackController {
 
         ModelAndView modelAndView = new ModelAndView();
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findUserByEmail(authentication.getName());
+
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("track/create");
         } else {
@@ -67,6 +71,7 @@ public class TrackController {
                 modelAndView.addObject("fileMessage", "Please choose a file");
             } else {
                 track.setFileUrl(file.getOriginalFilename());
+                track.setUploaderId(user.getId());
                 trackService.createTrack(track);
                 storageService.store(file);
 
@@ -152,6 +157,8 @@ public class TrackController {
         User user = userService.findUserByEmail(authentication.getName());
 
         Track track = trackService.getTrackById(id);
+        track.setUploaderId(user.getId());
+        trackService.getTrackById(id);
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
@@ -169,9 +176,13 @@ public class TrackController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(authentication.getName());
 
+
+
+
         List<Track> listOfTracks = trackService.getAllTracks();
 
         modelAndView.setViewName("track/list");
+        modelAndView.addObject(user);
         modelAndView.addObject("WelcomeUser", "Welcome, " + user.getName());
         modelAndView.addObject("tracks", listOfTracks);
 

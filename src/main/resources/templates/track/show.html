@@ -85,7 +85,7 @@
 
                 <div class="form-group">
                     <label for="description" class="form-label col-ld-1">Description</label>
-                    <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text" readonly  id="description"
+                    <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text" readonly disabled id="description"
                               th:field="*{description}" rows="4"></textarea>
                 </div> <!-- form-group// -->
 
@@ -102,13 +102,13 @@
 
         <br>
 
-        <form th:action="@{/track/{path}/edit(path=${track.id})}" method="get">
+        <form th:action="@{/track/{path}/edit(path=${track.id})}" method="get" th:if="${user.getId() == track.getUploaderId()}">
             <button class="btn btn-primary btn-block" type="Submit">Edit this track</button>
         </form>
 
         <br>
 
-        <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get">
+        <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get" th:if="${user.getId() == track.getUploaderId()}">
             <button class="btn btn-danger btn-block" type="Submit">Delete this track</button>
         </form>
 

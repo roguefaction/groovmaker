@@ -91,12 +91,12 @@
                                 </form>
                             </td>
                             <td>
-                                <form th:action="@{/track/{id}/edit(id=${track.id})}" method="get">
+                                <form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"  th:if="${user.getId() == track.getUploaderId()}" >
                                     <button class="btn btn-warning btn-block" type="Submit">Edit</button>
                                 </form>
                             </td>
                             <td>
-                                <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}" method="get">
+                                <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}" method="get" th:if="${user.getId() == track.getUploaderId()}">
                                     <button class="btn btn-danger btn-block" type="Submit" th:onclick="return confirm('Are you sure?')" >Delete</button>
                                 </form>
                             </td>
