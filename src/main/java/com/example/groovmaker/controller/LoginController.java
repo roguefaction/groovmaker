@@ -69,20 +69,6 @@ public class LoginController {
         return modelAndView;
     }
 
-    @GetMapping(value = "/user/home")
-    public ModelAndView home() {
-        ModelAndView modelAndView = new ModelAndView();
-
-        // get current users name from auth object
-        User user = getAuth();
-
-        // welcome objects added to displaying page
-        modelAndView.addObject(user);
-        modelAndView.addObject("userMessage", "Content Available Only for Users with User Role");
-
-        modelAndView.setViewName("user/home");
-        return modelAndView;
-    }
 
     @GetMapping(value = {"/", "/welcome"})
     public ModelAndView welcome() {

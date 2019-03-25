@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <title>Home Page</title>
+    <title>Track List</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-
-    <link rel="stylesheet" href="../../static/css/css/forms.css">
 
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -17,23 +14,24 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
+    <script src="../../static/css/js/scripts.js"></script>
 </head>
-
 <body>
+
 <nav class="navbar navbar-expand-md navbar-light bg-light">
     <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/welcome}">Welcome</a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link active" th:href="@{/user/home}">Home</a>
+            <li class="nav-item ">
+                <a class="nav-link" th:href="@{/user/home}">Home</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item ">
                 <a class="nav-link" th:href="@{/tracks}">Track List</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            <li class="nav-item active">
+                <a class="nav-link " th:href="@{/genres}">Genres</a>
             </li>
         </ul>
     </div>
@@ -54,17 +52,49 @@
         </ul>
     </div>
 </nav>
+
 <div class="container">
+    <H1 class="pt-3 pb-3">Here is a list of all the genres</H1>
 
-    <h1 class="pt-3 pb-3">Welcome to GroovMaker</h1>
+    <div class="card">
 
-    <p class="admin-message-text text-center" th:utext="${userMessage}"></p>
+        <article class="card-body ">
 
-    <form th:action="@{/track/create}" method="get">
-        <button class="btn btn-primary btn-block" type="Submit">Upload a Track</button>
-    </form>
+            <div class="container">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Genre</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td scope="row"><a th:href="@{/genre/{genre}(genre='jazz')}">Jazz</a></td>
+                    </tr>
+                    <tr>
+                        <td scope="row"><a th:href="@{/genre/{genre}(genre='folk')}">Folk</a></td>
+                    </tr>
+                    <tr>
+                        <td scope="row"><a th:href="@{/genre/{genre}(genre='electronic')}">Electronic</a></td>
+                    </tr>
+                    <tr>
+                        <td scope="row"><a th:href="@{/genre/{genre}(genre='rock')}">Rock</a></td>
+                    </tr>
+                    <tr>
+                        <td scope="row"><a th:href="@{/genre/{genre}(genre='rap')}">Rap</a></td>
+                    </tr>
+                </table>
+
+            </div>
+
+
+        </article>
+    </div> <!-- card.// -->
 
 
 </div>
+
+
+
 </body>
 </html>

@@ -28,6 +28,9 @@
             <li class="nav-item ">
                 <a class="nav-link" th:href="@{/tracks}">Track List</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </li>
         </ul>
     </div>
     <div class="mx-auto order-0">
@@ -76,6 +79,11 @@
                                th:field="*{genre}">
                     </div>
 
+                    <div class="form-group">
+                        <label for="uploader" class="form-label col-ld-1">Uploader</label>
+                        <input name="uploader" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="uploader"
+                               th:field="${uploader.name}">
+                    </div>
 
                     <div class="form-group">
                         <label for="description" class="form-label col-ld-1">Description</label>
@@ -83,17 +91,31 @@
                                   th:field="*{description}" rows="4"></textarea>
                     </div> <!-- form-group// -->
 
+
                 </div>
 
                 <div class="container col-3">
 
-                    <div class="form-group">
-                        <img th:src="*{imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
-                             th:alt="*{imageUrl}">
-                    </div>
+                     <div class="form-group">
+                         <img th:src="*{imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
+                              th:alt="*{imageUrl}">
+                     </div>
+
 
                 </div>
 
+            </form>
+
+            <!--<div class="form-group">-->
+                <!--<label for="uploader" class="form-label col-ld-1">Uploader</label>-->
+                <!--<input name="uploader" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="uploader"-->
+                       <!--th:field="${uploader.name}">-->
+            <!--</div>-->
+
+            <br>
+
+            <form th:action="@{/user/{id}/profile(id=${uploader.id})}">
+                <button class="btn btn-secondary btn-block" type="Submit">Visit Uploader Profile</button>
             </form>
 
 
@@ -117,7 +139,6 @@
         <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get" th:if="${user.getId() == track.getUploaderId()}">
             <button class="btn btn-danger btn-block" th:onclick="return confirm('Are you sure?')" type="Submit">Delete this track</button>
         </form>
-
 
 
 </div>

@@ -1,11 +1,12 @@
 package com.example.groovmaker.service;
 
 import com.example.groovmaker.model.Track;
+import com.example.groovmaker.model.User;
 import com.example.groovmaker.repository.TrackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,5 +61,29 @@ public class TrackService {
 
     }
 
+    public List<Track> findByUploader(User uploader) {
+        return this.trackRepository.findByUploader(uploader);
+    }
 
+    public List<Track> findByUploaderId(int uploaderId) {
+        return this.trackRepository.findByUploaderId(uploaderId);
+    }
+
+
+    public List<Track> getTracksByGenre(String genre) {
+        List<Track> allTracks = trackRepository.findAll();
+
+        Iterator<Track> trackIterator = allTracks.iterator();
+
+        while (trackIterator.hasNext()) {
+            Track currentTrack = trackIterator.next();
+
+            if (!currentTrack.getGenre().equalsIgnoreCase(genre)) {
+                trackIterator.remove();
+            }
+        }
+
+        return allTracks;
+
+    }
 }

@@ -28,6 +28,9 @@
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/tracks}">Track List</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </li>
         </ul>
     </div>
     <div class="mx-auto order-0">
@@ -85,7 +88,7 @@
                         <option>Folk</option>
                         <option>Electronic</option>
                         <option>Rock</option>
-                        <option>Rap or Hip/Hop</option>
+                        <option>Rap</option>
                     </select>
                     <small th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}"
                            class="validation-message text-danger">

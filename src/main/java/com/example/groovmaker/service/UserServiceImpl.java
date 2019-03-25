@@ -5,11 +5,14 @@ import com.example.groovmaker.model.User;
 import com.example.groovmaker.repository.RoleRepository;
 import com.example.groovmaker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,7 +35,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
-    public User saveUser(User user){
+    public User saveUser(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
         Role userRole = roleRepository.findByRole("USER");
@@ -40,7 +43,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    public User findUserById(int id) {
+        Optional<User> foundUser = userRepository.findById(id);
 
+        if (foundUser.isPresent()) {
+            return foundUser.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found");
+        }
+
+    }
 
 
 }

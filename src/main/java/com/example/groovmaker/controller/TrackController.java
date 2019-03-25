@@ -45,11 +45,14 @@ public class TrackController {
         Track track = trackService.getTrackById(id);
         ModelAndView modelAndView = new ModelAndView();
 
+        User uploader = userService.findUserById(track.getUploader().getId());
+
         User user = getAuth();
 
         modelAndView.addObject(user);
         modelAndView.setViewName("track/show");
         modelAndView.addObject(track);
+        modelAndView.addObject("uploader", uploader);
         return modelAndView;
     }
 
@@ -107,6 +110,22 @@ public class TrackController {
         return "redirect:/tracks";
     }
 
+    @GetMapping(value = "/genre/{genre}")
+    public ModelAndView getGenrePage(@PathVariable("genre") String genre) {
+
+        User user = getAuth();
+        List<Track> filteredTracks = trackService.getTracksByGenre(genre);
+
+        ModelAndView modelAndView = new ModelAndView();
+
+        modelAndView.addObject("genre", genre);
+        modelAndView.setViewName("track/genre");
+        modelAndView.addObject("tracks", filteredTracks);
+        modelAndView.addObject(user);
+        return modelAndView;
+
+    }
+
     @PostMapping(value = "/track/{id}")
     public ModelAndView updateTrack(@PathVariable("id") int id, @Valid Track track, BindingResult bindingResult, @RequestParam(value = "file", required = false) MultipartFile file) {
 
@@ -162,6 +181,18 @@ public class TrackController {
         modelAndView.addObject("track", new Track());
         modelAndView.addObject(user);
         modelAndView.setViewName("track/create");
+        return modelAndView;
+    }
+
+    @GetMapping(value = "/genres")
+    public ModelAndView getGenresPage() {
+
+        User user = getAuth();
+
+        // welcome objects added to displaying page
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(user);
+        modelAndView.setViewName("track/genres");
         return modelAndView;
     }
 

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="../../static/css/css/forms.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/welcome}">Welcome</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link active" th:href="@{/user/home}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/tracks}">Track List</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </li>
+        </ul>
+    </div>
+    <div class="mx-auto order-0">
+        <a class="navbar-brand mx-auto" th:href="@{/welcome}">GroovMaker</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:utext="'Welcome, ' + ${user.getName()}"></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <H1 class="pt-3 pb-3" th:utext="'Here is the profile for user: ' + ${userProfile.name}"></H1>
+    <div class="card">
+        <article class="card-body mb-4 mt-1">
+
+            <form th:object="${userProfile}" class="row">
+
+                <div class="container">
+
+                    <div class="form-group row container col-6">
+                        <label for="title" class="form-label col-ld-1 ">Name</label>
+                        <input name="title" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="title"
+                               th:field="*{name}">
+                    </div> <!-- form-group// -->
+
+                    <div class="form-group row container col-6">
+                        <label for="artist" class="form-label col-ld-1 ">Email</label>
+                        <input name="artist" class="form-control-plaintext font-weight-bold bigger-text " readonly type="text"
+                               id="artist"
+                               th:field="*{email}">
+                    </div> <!-- form-group// -->
+
+                </div>
+
+            </form>
+
+
+        </article>
+    </div> <!-- card.// -->
+
+    <br>
+
+    <div class="card">
+
+        <article class="card-body ">
+
+            <div class="container">
+                <div th:switch="${tracks}">
+                    <h2 th:case="null">No tracks yet!</h2>
+                    <div th:case="*">
+                        <h2>Users Tracks</h2>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Artist</th>
+                                <th scope="col">Genre</th>
+                                <th scope="col">Show</th>
+                                <th scope="col">Edit</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr  th:each="track : ${tracks}">
+                                <th scope="row" th:text="${track.title}"></th>
+                                <td th:text="${track.artist}"></td>
+                                <td th:text="${track.genre}"></td>
+                                <td>
+                                    <form th:action="@{/track/{id}/(id=${track.id})}" method="get">
+                                        <button class="btn btn-primary btn-block" type="Submit">Show</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"  th:if="${user.getId() == track.getUploaderId()}" >
+                                        <button class="btn btn-warning btn-block" type="Submit">Edit</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}" method="get" th:if="${user.getId() == track.getUploaderId()}">
+                                        <button class="btn btn-danger btn-block" type="Submit" th:onclick="return confirm('Are you sure?')" >Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </article>
+    </div>
+
+
+
+</div>
+</body>
+</html>
