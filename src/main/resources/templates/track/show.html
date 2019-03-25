@@ -102,7 +102,7 @@
 
         <br>
 
-        <form th:action="@{/track/download/{filename}(filename=${track.fileUrl})}" method="get">
+        <form th:action="@{/track/download/{filename}(filename=${track.fileUrl})}"  method="get">
             <button class="btn btn-success btn-block" type="Submit">Download</button>
         </form>
 
@@ -115,7 +115,7 @@
         <br>
 
         <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get" th:if="${user.getId() == track.getUploaderId()}">
-            <button class="btn btn-danger btn-block" type="Submit">Delete this track</button>
+            <button class="btn btn-danger btn-block" th:onclick="return confirm('Are you sure?')" type="Submit">Delete this track</button>
         </form>
 
 

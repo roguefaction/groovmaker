@@ -21,11 +21,11 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class TrackController {
-
 
     private TrackService trackService;
     private UserService userService;
@@ -59,6 +59,7 @@ public class TrackController {
         ModelAndView modelAndView = new ModelAndView();
 
         User user = getAuth();
+        modelAndView.addObject(user);
 
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("track/create");
@@ -67,16 +68,27 @@ public class TrackController {
                 modelAndView.setViewName("track/create");
                 modelAndView.addObject("fileMessage", "Please choose a file");
             } else {
-                track.setFileUrl(file.getOriginalFilename());
-                track.setUploaderId(user.getId());
-                trackService.createTrack(track);
-                storageService.store(file);
 
-                ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
-                newModelAndView.addObject("track", track);
-                return newModelAndView;
+                if (!checkFileType(file.getContentType())) {
+                    modelAndView.setViewName("track/create");
+                    modelAndView.addObject("fileMessage", "Uploaded files must be audio files");
+                } else {
+                    track.setFileUrl(file.getOriginalFilename());
+                    track.setUploaderId(user.getId());
+                    track.setUploader(user);
+                    trackService.createTrack(track);
+                    storageService.store(file);
+
+                    ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
+                    newModelAndView.addObject("track", track);
+                    return newModelAndView;
+                }
+
+
             }
+
         }
+
         return modelAndView;
     }
 
@@ -119,17 +131,25 @@ public class TrackController {
                 return newModelAndView;
 
             } else {
-                track.setFileUrl(file.getOriginalFilename());
-                storageService.store(file);
-                trackService.updateTrackById(id, track);
 
-                ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
-                newModelAndView.addObject(track);
-                return newModelAndView;
+                if (!checkFileType(file.getContentType())) {
+                    modelAndView.setViewName("track/create");
+                    modelAndView.addObject("fileMessage", "Uploaded files must be audio files");
+                } else {
+                    track.setFileUrl(file.getOriginalFilename());
+                    storageService.store(file);
+                    trackService.updateTrackById(id, track);
+
+                    ModelAndView newModelAndView = new ModelAndView("redirect:/track/" + track.getId());
+                    newModelAndView.addObject(track);
+                    return newModelAndView;
+                }
+
             }
 
         }
         return modelAndView;
+
     }
 
     @GetMapping(value = "/track/create")
@@ -197,6 +217,22 @@ public class TrackController {
     private User getAuth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.findUserByEmail(authentication.getName());
+    }
+
+    private boolean checkFileType(String fileType) {
+        List<String> alowedFileTypes = new ArrayList<>();
+        alowedFileTypes.add(0, "audio/mp3");
+        alowedFileTypes.add(1, "audio/flac");
+        alowedFileTypes.add(2, "audio/wav");
+
+        int matchedCases = 0;
+
+        for (String item : alowedFileTypes) {
+            if (item.equals(fileType))
+                matchedCases++;
+        }
+
+        return matchedCases > 0;
     }
 
 }

@@ -49,6 +49,7 @@ public class TrackService {
             updatedTrack.setImageUrl(track.getImageUrl());
             if (track.getFileUrl() != null)
                 updatedTrack.setFileUrl(track.getFileUrl());
+            updatedTrack.setUploader(foundTrack.get().getUploader());
 
             return trackRepository.save(updatedTrack);
 
