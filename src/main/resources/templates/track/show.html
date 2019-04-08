@@ -13,43 +13,13 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script rel="stylesheet" src="../../static/css/forms.css"></script>
+
 </head>
 <body>
 
-<nav class="navbar navbar-expand-md navbar-light bg-light">
-    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/welcome}">Welcome</a>
-            </li>
-            <li class="nav-item ">
-                <a class="nav-link" th:href="@{/user/home}">Home</a>
-            </li>
-            <li class="nav-item ">
-                <a class="nav-link" th:href="@{/tracks}">Track List</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/genres}">Genres</a>
-            </li>
-        </ul>
-    </div>
-    <div class="mx-auto order-0">
-        <a class="navbar-brand mx-auto" th:href="@{/welcome}">GroovMaker</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" th:utext="'Welcome, ' + ${user.getName()}"></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/logout}">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+<nav th:insert="fragments/general.html :: navigation"></nav>
 
 <div class="container">
     <H1 class="pt-3 pb-3">Here is your track</H1>
@@ -62,32 +32,31 @@
 
                     <div class="form-group">
                         <label for="title" class="form-label col-ld-1">Title</label>
-                        <input name="title" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="title"
+                        <input name="title" class="form-control-plaintext font-weight-bold bigger-text" readonly
+                               type="text" id="title"
                                th:field="*{title}">
                     </div> <!-- form-group// -->
 
                     <div class="form-group">
                         <label for="artist" class="form-label col-ld-1">Artist</label>
-                        <input name="artist" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text"
+                        <input name="artist" class="form-control-plaintext font-weight-bold bigger-text" readonly
+                               type="text"
                                id="artist"
                                th:field="*{artist}">
                     </div> <!-- form-group// -->
 
                     <div class="form-group">
                         <label for="genre" class="form-label col-ld-1">Genre</label>
-                        <input name="genre" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="genre"
+                        <input name="genre" class="form-control-plaintext font-weight-bold bigger-text" readonly
+                               type="text" id="genre"
                                th:field="*{genre}">
                     </div>
 
-                    <div class="form-group">
-                        <label for="uploader" class="form-label col-ld-1">Uploader</label>
-                        <input name="uploader" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="uploader"
-                               th:field="${uploader.name}">
-                    </div>
 
                     <div class="form-group">
                         <label for="description" class="form-label col-ld-1">Description</label>
-                        <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text" readonly disabled id="description"
+                        <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text"
+                                  readonly disabled id="description"
                                   th:field="*{description}" rows="4"></textarea>
                     </div> <!-- form-group// -->
 
@@ -96,53 +65,204 @@
 
                 <div class="container col-3">
 
-                     <div class="form-group">
-                         <img th:src="*{imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
-                              th:alt="*{imageUrl}">
-                     </div>
-
-
+                    <div class="form-group">
+                        <img th:src="*{imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
+                             th:alt="*{imageUrl}">
+                    </div>
                 </div>
 
             </form>
 
-            <!--<div class="form-group">-->
-                <!--<label for="uploader" class="form-label col-ld-1">Uploader</label>-->
-                <!--<input name="uploader" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="uploader"-->
-                       <!--th:field="${uploader.name}">-->
-            <!--</div>-->
+
+            <div class="container">
+                <div th:insert="fragments/general.html :: checkProfileTrack"></div>
+            </div>
+
+            <br th:if="not ${track.getFavoritedBy().contains(user)}">
+
+            <form th:action="@{/track/{id}/favorite(id=${track.id})}"
+                  th:if="not ${track.getFavoritedBy().contains(user)}" method="post">
+                <button class="btn btn-success btn-block" type="Submit">Add to favorites</button>
+            </form>
+
+            <br th:if="${track.getFavoritedBy().contains(user)}">
+
+            <form th:action="@{/track/{id}/unfavorite(id=${track.id})}" th:if="${track.getFavoritedBy().contains(user)}"
+                  method="post">
+                <button class="btn btn-danger btn-block" type="Submit">Remove from favorites</button>
+            </form>
 
             <br>
 
-            <form th:action="@{/user/{id}/profile(id=${uploader.id})}">
-                <button class="btn btn-secondary btn-block" type="Submit">Visit Uploader Profile</button>
+            <form th:action="@{/track/download/{filename}(filename=${track.fileUrl})}" method="get">
+                <button class="btn btn-success btn-block" type="Submit">Download</button>
             </form>
 
+            <br th:if="${user.getId() == track.getUploaderId()}">
+
+            <form th:action="@{/track/{path}/edit(path=${track.id})}" method="get"
+                  th:if="${user.getId() == track.getUploaderId()}">
+                <button class="btn btn-primary btn-block" type="Submit">Edit this track</button>
+            </form>
+
+            <br th:if="${user.getId() == track.getUploaderId()}">
+
+            <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get"
+                  th:if="${user.getId() == track.getUploaderId()}">
+                <button class="btn btn-danger btn-block" th:onclick="return confirm('Are you sure?')" type="Submit">
+                    Delete this track
+                </button>
+            </form>
 
         </article>
     </div> <!-- card.// -->
 
-        <br>
+    <br>
 
-        <form th:action="@{/track/download/{filename}(filename=${track.fileUrl})}"  method="get">
-            <button class="btn btn-success btn-block" type="Submit">Download</button>
-        </form>
+    <div class="card container">
+        <div class="card-body">
 
-        <br>
+            <h3>Add to playlist</h3>
 
-        <form th:action="@{/track/{path}/edit(path=${track.id})}" method="get" th:if="${user.getId() == track.getUploaderId()}">
-            <button class="btn btn-primary btn-block" type="Submit">Edit this track</button>
-        </form>
+            <br>
 
-        <br>
+            <div th:if="not ${#lists.isEmpty(playlists)}">
 
-        <form th:action="@{/track/{path}/delete(path=${track.id})}" method="get" th:if="${user.getId() == track.getUploaderId()}">
-            <button class="btn btn-danger btn-block" th:onclick="return confirm('Are you sure?')" type="Submit">Delete this track</button>
-        </form>
+                <form action="#" th:action="@{/track/{id}/addtoplaylist(id=${track.id})}" th:object="${playlist}"
+                      th:method="post">
+
+                    <div class="row">
+
+                        <div class="form-group row col-8">
+                            <label for="playlist" class="form-label col-4">Your Playlists</label>
+
+                            <select class="form-control col-8" id="playlist" name="playlist" th:object="${playlist}">
+                                <option th:value="${playlist.id}" th:text="${playlist.name}"
+                                        th:each="playlist : ${playlists}"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-4">
+                            <button type="submit" class="btn btn-success btn-block ">Add to playlist</button>
+                        </div> <!-- form-group// -->
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div th:if="${#lists.isEmpty(playlists)}">
+
+                <form action="#" th:action="@{/track/{id}/addtoplaylist(id=${track.id})}" th:object="${playlist}"
+                      th:method="post">
+
+                    <div class="row">
+
+                        <div class="form-group row col-8">
+                            <label for="playlist" class="form-label col-4">Your Playlists</label>
+
+                            <select class="form-control col-8" id="playlist" name="playlist" disabled>
+                                <option th:text="'All your playlists contain this track'"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-4">
+                            <button type="submit" class="btn btn-success btn-block " disabled>Add to playlist</button>
+                        </div> <!-- form-group// -->
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+    <br>
+
+    <div class="card container">
+        <div class="card-body">
+
+            <h3>Post a comment</h3>
+
+            <br>
+
+            <form action="#" th:action="@{/track/{id}/comment(id=${track.id})}"
+                  th:href="@{/track/{id}/(id=${track.id})}" th:object="${comment}" th:method="post">
+
+                <div class="row">
+
+                    <div class="form-group row col-10">
+                        <label for="content" class="form-label col-4" th:text="${user.name}"></label>
+                        <input name="content" class="form-control col-8" th:rows="2" placeholder="Comment" type="text"
+                               id="content"
+                               maxlength="50">
+                    </div> <!-- form-group// -->
 
 
+                    <div class="form-group col-2">
+                        <button type="submit" class="btn btn-success btn-block">Post</button>
+                    </div> <!-- form-group// -->
+
+                </div>
+
+
+            </form>
+
+        </div>
+    </div>
+
+    <br>
+
+    <div class="card container">
+        <div class="card-body">
+
+            <h4 th:if="${#lists.isEmpty(comments)}">No comments yet!</h4>
+
+            <div th:if="${not #lists.isEmpty(comments)}">
+
+                <h3>Comments</h3>
+
+                <br>
+
+
+                <div th:each="comment : ${comments}" class="card">
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <span class="col-2 font-weight-bold" th:text="${comment.commenter.getName()}"></span>
+                            <span class="col-2"
+                                  th:text="${#temporals.format(comment.timestamp, 'yyyy-MM-dd HH:mm')}"></span>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <span class="col-10" th:text="${comment.content}"></span>
+                            <div class="col-2">
+                                <form th:action="@{/track/{track_id}/comment/{comment_id}/delete(comment_id=${comment.id}, track_id=${track.id})}"
+                                      th:href="@{/track/{id}/(id=${track.id})}"
+                                      method="get" th:if="${user.getId() == comment.commenter.getId()}">
+                                    <button class="btn btn-danger btn-block" type="Submit"
+                                            th:onclick="return confirm('Are you sure?')">Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 </div>
 
+<br>
 
 </body>
 </html>

@@ -1,13 +1,14 @@
 package com.example.groovmaker.controller;
 
 import com.example.groovmaker.exception.StorageFileNotFoundException;
+import com.example.groovmaker.model.Playlist;
 import com.example.groovmaker.model.Track;
 import com.example.groovmaker.model.User;
-import com.example.groovmaker.service.StorageService;
-import com.example.groovmaker.service.TrackService;
-import com.example.groovmaker.service.UserService;
+import com.example.groovmaker.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class TrackController {
@@ -30,28 +35,48 @@ public class TrackController {
     private TrackService trackService;
     private UserService userService;
     private StorageService storageService;
-
+    private HibernateSearchService searchservice;
+    private CommentService commentService;
+    private PlaylistService playlistService;
 
     @Autowired
-    public TrackController(TrackService trackService, UserService userService, StorageService storageService) {
+    public TrackController(TrackService trackService, UserService userService, StorageService storageService, HibernateSearchService searchservice, CommentService commentService, PlaylistService playlistService) {
         this.trackService = trackService;
         this.userService = userService;
         this.storageService = storageService;
+        this.searchservice = searchservice;
+        this.commentService = commentService;
+        this.playlistService = playlistService;
     }
+
 
 
     @GetMapping(value = "/track/{id}")
     public ModelAndView getTrackById(@PathVariable("id") int id) {
         Track track = trackService.getTrackById(id);
         ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("track/show");
 
         User uploader = userService.findUserById(track.getUploader().getId());
 
-        User user = getAuth();
 
-        modelAndView.addObject(user);
-        modelAndView.setViewName("track/show");
-        modelAndView.addObject(track);
+        User user = getAuthenticatedUser();
+
+        modelAndView.addObject("comments", commentService.getTracksComments(id));
+        modelAndView.addObject("user", user);
+        modelAndView.addObject("track", track);
+
+        List<Playlist> playlists = playlistService.getUsersPlaylists(getAuthenticatedUser());
+
+        Iterator<Playlist> iterator = playlists.iterator();
+        while(iterator.hasNext()) {
+            Playlist currentPlaylist = iterator.next();
+            if(track.getInPlaylist().contains(currentPlaylist)){
+                iterator.remove();
+            }
+        }
+
+        modelAndView.addObject("playlists", playlists);
         modelAndView.addObject("uploader", uploader);
         return modelAndView;
     }
@@ -61,7 +86,7 @@ public class TrackController {
 
         ModelAndView modelAndView = new ModelAndView();
 
-        User user = getAuth();
+        User user = getAuthenticatedUser();
         modelAndView.addObject(user);
 
         if (bindingResult.hasErrors()) {
@@ -98,7 +123,7 @@ public class TrackController {
     @GetMapping(value = "/track/{id}/delete")
     public String deleteTrackById(@PathVariable("id") int id) {
 
-        User user = getAuth();
+        User user = getAuthenticatedUser();
 
         Track track = trackService.getTrackById(id);
 
@@ -111,16 +136,33 @@ public class TrackController {
     }
 
     @GetMapping(value = "/genre/{genre}")
-    public ModelAndView getGenrePage(@PathVariable("genre") String genre) {
+    public ModelAndView getGenrePage(@PathVariable("genre") String genre,
+                                     @RequestParam("page") Optional<Integer> page,
+                                     @RequestParam("size") Optional<Integer> size) {
+        ModelAndView modelAndView = new ModelAndView();
+        User user = getAuthenticatedUser();
 
-        User user = getAuth();
         List<Track> filteredTracks = trackService.getTracksByGenre(genre);
 
-        ModelAndView modelAndView = new ModelAndView();
+
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(6);
+
+        Page<Track> trackPage = trackService.findPaginatedTracks(PageRequest.of(currentPage - 1, pageSize), filteredTracks);
+        modelAndView.addObject("tracksPage", trackPage);
 
         modelAndView.addObject("genre", genre);
         modelAndView.setViewName("track/genre");
+
+        int totalPages = trackPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            modelAndView.addObject("pageNumbers", pageNumbers);
+        }
         modelAndView.addObject("tracks", filteredTracks);
+
         modelAndView.addObject(user);
         return modelAndView;
 
@@ -129,7 +171,7 @@ public class TrackController {
     @PostMapping(value = "/track/{id}")
     public ModelAndView updateTrack(@PathVariable("id") int id, @Valid Track track, BindingResult bindingResult, @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        User user = getAuth();
+        User user = getAuthenticatedUser();
 
         Track checkTrack = trackService.getTrackById(id);
         if (user.getId() != checkTrack.getUploaderId())
@@ -174,7 +216,7 @@ public class TrackController {
     @GetMapping(value = "/track/create")
     public ModelAndView createTrackPage() {
 
-        User user = getAuth();
+        User user = getAuthenticatedUser();
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
@@ -187,7 +229,7 @@ public class TrackController {
     @GetMapping(value = "/genres")
     public ModelAndView getGenresPage() {
 
-        User user = getAuth();
+        User user = getAuthenticatedUser();
 
         // welcome objects added to displaying page
         ModelAndView modelAndView = new ModelAndView();
@@ -199,7 +241,7 @@ public class TrackController {
     @GetMapping(value = "/track/{id}/edit")
     public ModelAndView editTrackPage(@PathVariable("id") int id) {
 
-        User user = getAuth();
+        User user = getAuthenticatedUser();
 
         Track track = trackService.getTrackById(id);
         track.setUploaderId(user.getId());
@@ -216,15 +258,30 @@ public class TrackController {
 
 
     @GetMapping(value = "/tracks")
-    public ModelAndView getAllTracks() {
+    public ModelAndView getAllTracks(@RequestParam("page") Optional<Integer> page,
+                                     @RequestParam("size") Optional<Integer> size) {
         ModelAndView modelAndView = new ModelAndView();
-
-        User user = getAuth();
+        User user = getAuthenticatedUser();
 
         List<Track> listOfTracks = trackService.getAllTracks();
 
+
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(6);
+
+        Page<Track> trackPage = trackService.findPaginatedTracks(PageRequest.of(currentPage - 1, pageSize), listOfTracks);
+        modelAndView.addObject("tracksPage", trackPage);
+
         modelAndView.setViewName("track/list");
         modelAndView.addObject(user);
+
+        int totalPages = trackPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            modelAndView.addObject("pageNumbers", pageNumbers);
+        }
         modelAndView.addObject("tracks", listOfTracks);
 
         return modelAndView;
@@ -245,7 +302,7 @@ public class TrackController {
     }
 
 
-    private User getAuth() {
+    private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.findUserByEmail(authentication.getName());
     }
@@ -264,6 +321,47 @@ public class TrackController {
         }
 
         return matchedCases > 0;
+    }
+
+    @GetMapping(value = "/search")
+    public ModelAndView search(@RequestParam(value = "search", required = false) String q,
+                               @RequestParam("page") Optional<Integer> page,
+                               @RequestParam("size") Optional<Integer> size) {
+
+        ModelAndView modelAndView = new ModelAndView();
+        List<Track> searchResults = null;
+        try {
+            trackService.getAllTracks();
+            searchResults = searchservice.fuzzySearch(q);
+
+        } catch (Exception ex) {
+            // here you should handle unexpected errors
+            // ...
+            // throw ex;
+        }
+
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(6);
+
+        Page<Track> trackPage = trackService.findPaginatedTracks(PageRequest.of(currentPage - 1, pageSize), searchResults);
+        modelAndView.addObject("tracksPage", trackPage);
+
+        User user = getAuthenticatedUser();
+
+        int totalPages = trackPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            modelAndView.addObject("pageNumbers", pageNumbers);
+        }
+
+        modelAndView.setViewName("track/list");
+        modelAndView.addObject(user);
+        modelAndView.addObject("tracks", searchResults);
+
+        return modelAndView;
+
     }
 
 }

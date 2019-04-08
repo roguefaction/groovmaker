@@ -1,5 +1,6 @@
 package com.example.groovmaker.repository;
 
+import com.example.groovmaker.model.Playlist;
 import com.example.groovmaker.model.Track;
 import com.example.groovmaker.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,5 +13,9 @@ public interface TrackRepository extends JpaRepository<Track, Integer> {
 
     List<Track> findByUploader(User uploader);
     List<Track> findByUploaderId(int uploaderId);
+
+    List<Track> findByFavoritedBy(User user);
+
+    List<Track> findByInPlaylist(Playlist playlist);
 
 }

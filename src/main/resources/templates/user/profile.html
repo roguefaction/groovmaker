@@ -20,81 +20,32 @@
 </head>
 
 <body>
-<nav class="navbar navbar-expand-md navbar-light bg-light">
-    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/welcome}">Welcome</a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link active" th:href="@{/user/home}">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/tracks}">Track List</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/genres}">Genres</a>
-            </li>
-        </ul>
-    </div>
-    <div class="mx-auto order-0">
-        <a class="navbar-brand mx-auto" th:href="@{/welcome}">GroovMaker</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" th:utext="'Welcome, ' + ${user.getName()}"></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/logout}">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+
+<nav th:insert="fragments/general.html :: navigation"></nav>
+
 <div class="container">
     <H1 class="pt-3 pb-3" th:utext="'Here is the profile for user: ' + ${userProfile.name}"></H1>
-    <div class="card">
-        <article class="card-body mb-4 mt-1">
 
-            <form th:object="${userProfile}" class="row">
+    <div th:insert="fragments/general.html :: profileInfo"></div>
 
-                <div class="container">
-
-                    <div class="form-group row container col-6">
-                        <label for="title" class="form-label col-ld-1 ">Name</label>
-                        <input name="title" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="title"
-                               th:field="*{name}">
-                    </div> <!-- form-group// -->
-
-                    <div class="form-group row container col-6">
-                        <label for="artist" class="form-label col-ld-1 ">Email</label>
-                        <input name="artist" class="form-control-plaintext font-weight-bold bigger-text " readonly type="text"
-                               id="artist"
-                               th:field="*{email}">
-                    </div> <!-- form-group// -->
-
-                </div>
-
-            </form>
-
-
-        </article>
-    </div> <!-- card.// -->
+    <div th:insert="fragments/general.html :: profileNavigation"></div>
 
     <br>
 
-    <div class="card">
+    <div class="card container">
+
+
+        <div class="validation-message text-danger">
+            <p class="admin-message-text text-center" th:utext="${message}"></p>
+        </div>
 
         <article class="card-body ">
 
             <div class="container">
-                <div th:switch="${tracks}">
-                    <h2 th:case="null">No tracks yet!</h2>
-                    <div th:case="*">
-                        <h2>Users Tracks</h2>
+                <div>
+                    <h2 th:if="${#lists.isEmpty(tracks)}">No tracks found!</h2>
+                    <div th:if="${not #lists.isEmpty(tracks)}">
+                        <h2>Uploaded Tracks</h2>
                         <table class="table">
                             <thead>
                             <tr>
@@ -106,8 +57,36 @@
                                 <th scope="col">Delete</th>
                             </tr>
                             </thead>
+
+                            <!--<tbody>-->
+                            <!--<tr th:each="track : ${tracks}">-->
+                            <!--<th scope="row" th:text="${track.title}"></th>-->
+                            <!--<td th:text="${track.artist}"></td>-->
+                            <!--<td th:text="${track.genre}"></td>-->
+                            <!--<td>-->
+                            <!--<form th:action="@{/track/{id}/(id=${track.id})}" method="get">-->
+                            <!--<button class="btn btn-primary btn-block" type="Submit">Show</button>-->
+                            <!--</form>-->
+                            <!--</td>-->
+                            <!--<td>-->
+                            <!--<form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"-->
+                            <!--th:if="${user.getId() == track.getUploaderId()}">-->
+                            <!--<button class="btn btn-warning btn-block" type="Submit">Edit</button>-->
+                            <!--</form>-->
+                            <!--</td>-->
+                            <!--<td>-->
+                            <!--<form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}"-->
+                            <!--method="get" th:if="${user.getId() == track.getUploaderId()}">-->
+                            <!--<button class="btn btn-danger btn-block" type="Submit"-->
+                            <!--th:onclick="return confirm('Are you sure?')">Delete-->
+                            <!--</button>-->
+                            <!--</form>-->
+                            <!--</td>-->
+                            <!--</tr>-->
+                            <!--</tbody>-->
+
                             <tbody>
-                            <tr  th:each="track : ${tracks}">
+                            <tr th:each="track : ${tracksPage.content}">
                                 <th scope="row" th:text="${track.title}"></th>
                                 <td th:text="${track.artist}"></td>
                                 <td th:text="${track.genre}"></td>
@@ -117,13 +96,17 @@
                                     </form>
                                 </td>
                                 <td>
-                                    <form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"  th:if="${user.getId() == track.getUploaderId()}" >
+                                    <form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"
+                                          th:if="${user.getId() == track.getUploaderId()}">
                                         <button class="btn btn-warning btn-block" type="Submit">Edit</button>
                                     </form>
                                 </td>
                                 <td>
-                                    <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}" method="get" th:if="${user.getId() == track.getUploaderId()}">
-                                        <button class="btn btn-danger btn-block" type="Submit" th:onclick="return confirm('Are you sure?')" >Delete</button>
+                                    <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}"
+                                          method="get" th:if="${user.getId() == track.getUploaderId()}">
+                                        <button class="btn btn-danger btn-block" type="Submit"
+                                                th:onclick="return confirm('Are you sure?')">Delete
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
@@ -135,10 +118,27 @@
 
 
         </article>
+    </div> <!-- card.// -->
+
+    <br>
+
+    <div class="card container">
+        <div class="card-body row">
+
+            <nav aria-label="Page navigation example" class="container row d-flex justify-content-center">
+                <ul th:if="${tracksPage.totalPages > 0}" class="pagination" th:each="pageNumber : ${pageNumbers}">
+                    <li class="btn btn-outline-secondary"><a class="text-secondary"
+                                                             th:href="@{/user/{id}/profile(id= ${userProfile.id},size=${tracksPage.size}, page=${pageNumber})}"
+                                                             th:text="${pageNumber}  "
+                                                             th:class="${pageNumber==tracksPage.number + 1} ? active">1</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
     </div>
 
-
-
 </div>
+
 </body>
 </html>

@@ -1,10 +1,12 @@
 package com.example.groovmaker.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -37,6 +39,16 @@ public class User {
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
+
+    @JsonBackReference
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "favoritedBy")
+    private Set<Track> favoriteTracks = new HashSet<>();
+
     public User(@Email(message = "Please enter a valid email address") @NotEmpty(message = "Please enter an email address") String email, @NotEmpty(message = "Please enter your name") String name, @NotEmpty(message = "Please enter a valid password") @Length(min = 5, message = "Your password must be atleast 5 characters long") String password, Set<Role> roles) {
         this.email = email;
         this.name = name;
@@ -45,6 +57,14 @@ public class User {
     }
 
     public User() {
+    }
+
+    public Set<Track> getFavoriteTracks() {
+        return favoriteTracks;
+    }
+
+    public void setFavoriteTracks(Set<Track> favoriteTracks) {
+        this.favoriteTracks = favoriteTracks;
     }
 
     public int getActive() {
