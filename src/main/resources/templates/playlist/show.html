@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Track Show</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script rel="stylesheet" src="../../static/css/forms.css"></script>
+
+</head>
+<body>
+
+<nav th:insert="fragments/general.html :: navigation"></nav>
+
+<div class="container">
+    <H1 class="pt-3 pb-3">Here is your playlist</H1>
+    <div class="card">
+        <article class="card-body mb-4 mt-1">
+
+            <form th:object="${playlist}">
+
+                <div class="container">
+
+                    <div class="form-group">
+                        <label for="name" class="form-label col-ld-1">Name</label>
+                        <input name="name" class="form-control-plaintext font-weight-bold bigger-text" readonly type="text" id="name"
+                               th:field="*{name}">
+                    </div> <!-- form-group// -->
+
+                    <div class="form-group">
+                        <label for="description" class="form-label col-ld-1">Description</label>
+                        <textarea name="description" class="form-control-plaintext font-weight-bold bigger-text" readonly disabled id="description"
+                                  th:field="*{description}" rows="4"></textarea>
+                    </div> <!-- form-group// -->
+
+                </div>
+
+            </form>
+
+            <div th:insert="fragments/general.html :: checkProfilePlaylist"></div>
+
+
+            <div th:if="${user.getId() == creator.getId()}">
+
+                <br>
+
+                <form th:action="@{/playlist/{id}/edit(id=${playlist.id})}" method="get" >
+                    <button class="btn btn-primary btn-block" type="Submit">Edit this playlist</button>
+                </form>
+
+            </div>
+
+            <div th:if="${user.getId() == creator.getId()}">
+
+                <br>
+
+                <form th:action="@{/playlist/{id}/delete(id=${playlist.id})}" method="post" th:if="${user.getId() == creator.getId()}">
+                    <button class="btn btn-danger btn-block" th:onclick="return confirm('Are you sure?')" type="Submit">Delete this playlist</button>
+                </form>
+
+            </div>
+
+        </article>
+    </div> <!-- card.// -->
+
+    <br>
+
+    <div class="card container">
+
+
+        <div class="validation-message text-danger">
+            <p class="admin-message-text text-center" th:utext="${message}"></p>
+        </div>
+
+        <article class="card-body ">
+
+            <div class="container">
+                <div>
+                    <h2 th:if="${#lists.isEmpty(tracks.content)}">There are no tracks in this playlist</h2>
+                    <div th:if="not ${#lists.isEmpty(tracks.content)}">
+                        <h2>Favorited Tracks</h2>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Artist</th>
+                                <th scope="col">Genre</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col">Playlist</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="track : ${tracks.content}">
+                                <th scope="row" th:text="${track.title}"></th>
+                                <td th:text="${track.artist}"></td>
+                                <td th:text="${track.genre}"></td>
+                                <td>
+                                    <form th:action="@{/track/{id}/(id=${track.id})}" method="get">
+                                        <button class="btn btn-primary btn-block" type="Submit">Show</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"
+                                          th:if="${user.getId() == track.getUploaderId()}">
+                                        <button class="btn btn-warning btn-block" type="Submit">Edit</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}"
+                                          method="get" th:if="${user.getId() == track.getUploaderId()}">
+                                        <button class="btn btn-danger btn-block" type="Submit"
+                                                th:onclick="return confirm('Are you sure?')">Delete
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/track/{track_id}/removefromplaylist/{playlistId}(track_id=${track.id},playlistId=${playlist.id})}"
+                                          method="post">
+                                        <button class="btn btn-danger btn-block" type="Submit"
+                                                th:onclick="return confirm('Are you sure?')">Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </article>
+    </div> <!-- card.// -->
+
+
+
+</div>
+<br>
+
+</body>
+</html>

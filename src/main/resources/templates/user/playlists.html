@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="../../static/css/css/forms.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+
+<nav th:insert="fragments/general.html :: navigation"></nav>
+
+<div class="container">
+    <H1 class="pt-3 pb-3" th:utext="'Here is the profile for user: ' + ${userProfile.name}"></H1>
+
+    <div th:insert="fragments/general.html :: profileInfo"></div>
+
+    <div th:insert="fragments/general.html :: profileNavigation"></div>
+
+    <div th:insert="fragments/general.html :: createPlaylist"></div>
+
+    <div class="card container">
+
+
+
+
+        <div class="validation-message text-danger">
+            <p class="admin-message-text text-center" th:utext="${message}"></p>
+        </div>
+
+        <article class="card-body ">
+
+            <div class="container">
+                <div>
+                    <h2 th:if="${#lists.isEmpty(playlists.content)}">No playlists found!</h2>
+                    <div th:if="not ${#lists.isEmpty(playlists.content)}">
+                        <div class="container p-b-3">
+                            <h2>Users Playlists</h2>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Owner</th>
+                                <th scope="col">Track Count</th>
+                                <th scope="col">Show</th>
+                                <th scope="col">Edit</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="playlist : ${playlists.content}">
+                                <th scope="row" th:text="${playlist.name}"></th>
+                                <td th:text="${playlist.getCreator().getName()}"></td>
+                                <td th:text="${playlist.tracks.size()}"></td>
+                                <td>
+                                    <form th:action="@{/playlist/{id}/(id=${playlist.id})}" method="get">
+                                        <button class="btn btn-primary btn-block" type="Submit">Show</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/playlist/{id}/edit(id=${playlist.id})}" method="get"
+                                          th:if="${user.getId() == playlist.getCreator().getId()}">
+                                        <button class="btn btn-warning btn-block" type="Submit">Edit</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/playlist/{id}/delete(id=${playlist.id})}"
+                                          method="post" th:if="${user.getId() == playlist.getCreator().getId()}">
+                                        <button class="btn btn-danger btn-block" type="Submit"
+                                                th:onclick="return confirm('Are you sure?')">Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </article>
+    </div> <!-- card.// -->
+
+    <br>
+
+    <div class="card container">
+        <div class="card-body row">
+
+            <nav aria-label="Page navigation example" class="container row d-flex justify-content-center">
+                <ul th:if="${tracks.totalPages > 0}" class="pagination" th:each="pageNumber : ${pageNumbers}">
+                    <li class="btn btn-outline-secondary"><a class="text-secondary"
+                                                             th:href="@{/user/{id}/profile(id= ${user.id},size=${tracks.size}, page=${pageNumber})}"
+                                                             th:text="${pageNumber}  "
+                                                             th:class="${pageNumber==tracks.number + 1} ? active">1</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

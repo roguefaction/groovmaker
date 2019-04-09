@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Track Upload </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<nav th:insert="fragments/general.html :: navigation"></nav>
+
+
+<div class="container">
+    <H1 class="pt-3 pb-3">Create a playlist!</H1>
+    <div class="card">
+        <article class="card-body ">
+
+            <h3 class="card-title mb-4 mt-1">Fill in the form</h3>
+
+            <form autocomplete="off" action="#" th:action="@{/playlist/create}" method="POST" th:object="${playlist}"
+                  enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label for="name" class="form-label col-ld-1">Name</label>
+                    <input name="name" class="form-control " placeholder="Title" type="text" id="name"
+                           th:field="*{name}" maxlength="50">
+                    <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+                           class="validation-message text-danger">
+                    </small>
+                </div> <!-- form-group// -->
+
+                <div class="form-group">
+                    <label for="description" class="form-label col-ld-1">Description</label>
+                    <textarea class="form-control" placeholder="Description"  name="description"
+                              id="description" th:field="*{description}" rows="4" maxlength="500"></textarea>
+                    <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+                           class="validation-message text-danger">
+                    </small>
+                </div> <!-- form-group// -->
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block"> Submit</button>
+                </div> <!-- form-group// -->
+
+            </form>
+            <form th:action="@{/user/playlists}" method="get">
+                <button class="btn btn-primary btn-block" type="Submit">Back to Home</button>
+            </form>
+        </article>
+    </div> <!-- card.// -->
+</div>
+</body>
+</html>

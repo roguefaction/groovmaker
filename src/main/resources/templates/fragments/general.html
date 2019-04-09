@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="navbar">
+    <meta charset="UTF-8" />
+    <link th:href="@{../../static/css/forms.css}" rel="stylesheet">
+</head>
+<body>
+
+<footer th:fragment="footer">
+    <a th:href="@{/fragments}">Fragments Index</a> |
+    <a th:href="@{/markup}">Markup inclussion</a> |
+    <a th:href="@{/params}">Fragment params</a> |
+    <a th:href="@{/other}">Other</a>
+</footer>
+
+<nav th:fragment="navigation" class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/welcome}" >Welcome</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" th:href="@{/user/home}">Home</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" th:href="@{/tracks}">Track List</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </li>
+        </ul>
+    </div>
+    <div class="mx-auto order-0">
+        <a class="navbar-brand mx-auto" th:href="@{/welcome}">GroovMaker</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <span class="navbar-text" th:utext="'Welcome, ' + ${user.getName()} + '    '">
+            </span>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" th:utext="'My Stuff'" aria-expanded="false">
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="nav-link" th:href="@{/user/{id}/profile(id=${user.id})}">My Profile</a>
+                    <a class="nav-link" th:href="@{/playlist/create}">Create Playlist</a>
+                    <a class="nav-link" th:href="@{/user/{id}/playlists(id=${user.id})}">My Playlists</a>
+                    <a class="nav-link" th:href="@{/user/favorites}">My Favorites</a>
+                    <a class="nav-link" th:href="@{/user/{id}/profile(id=${user.id})}">My Uploads</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">Logout</a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+
+<div th:if="${user.getId() == userProfile.getId()}" th:fragment="profileNavigation">
+    <br>
+
+    <div class="card container">
+        <div class="card-body row">
+
+            <form th:action="@{/user/{id}/profile(id=${user.id})}" method="get" class="col-4">
+                <button class="btn btn-primary btn-block" type="Submit">My Uploads</button>
+            </form>
+
+            <form th:action="@{/user/favorites}" method="get" class="col-4">
+                <button class="btn btn-success btn-block" type="Submit">My Favorites</button>
+            </form>
+
+            <form th:action="@{/user/{id}/playlists(id=${user.id})}" method="get" class="col-4">
+                <button class="btn btn-success btn-block" type="Submit">My Playlists</button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<div th:if="not ${user.getId() == userProfile.getId()}" th:fragment="profileNavigation">
+    <br>
+
+    <div class="card container">
+        <div class="card-body row">
+
+            <form th:action="@{/user/{id}/profile(id=${userProfile.id})}" method="get" class="col-6">
+                <button class="btn btn-primary btn-block" type="Submit">Users Uploads</button>
+            </form>
+
+            <form th:action="@{/user/{id}/playlists(id=${userProfile.id})}" method="get" class="col-6">
+                <button class="btn btn-success btn-block" type="Submit">Users Playlists</button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<div th:if="${user.getId() == userProfile.getId()}" th:fragment="createPlaylist">
+
+    <br>
+
+    <div class="card container">
+        <div class="card-body">
+
+            <form th:action="@{/playlist/create}" method="get">
+                <button class="btn btn-warning btn-block" type="Submit">+ Create a new Playlist!</button>
+            </form>
+
+        </div>
+    </div>
+
+    <br>
+</div>
+
+<div th:fragment="profileInfo">
+
+    <div class="card">
+        <article class="card-body">
+
+            <form th:object="${userProfile}" >
+
+                <div class="container row">
+
+                    <div class="form-group row col-6">
+                        <label for="title" class="col-sm-2 col-form-label">Name</label>
+                        <input name="title" class="form-control-plaintext col-sm-10 font-weight-bold" readonly
+                               type="text" id="title"
+                               th:field="*{name}">
+                    </div> <!-- form-group// -->
+
+                    <div class="form-group row col-6">
+                        <label for="artist" class="col-form-label col-sm-2">Email</label>
+                        <input name="artist" class="form-control-plaintext col-sm-10 font-weight-bold" readonly
+                               type="text"
+                               id="artist"
+                               th:field="*{email}">
+                    </div> <!-- form-group// -->
+
+
+                </div>
+
+            </form>
+
+        </article>
+    </div>
+
+</div>
+
+
+<div class="card" th:fragment="checkProfilePlaylist">
+    <div class="card-body">
+
+        <form th:action="@{/user/{id}/profile(id=${creator.id})}" >
+
+            <div class=" row">
+
+                <div class="form-group-new row col-6">
+                    <label for="uploader" class="col-sm-4 col-form-label">Creator</label>
+                    <input name="uploader" class="form-control-plaintext col-sm-8 font-weight-bold" readonly type="text" id="uploader"
+                           th:field="${creator.name}" >
+                </div>
+
+                <div class="col-6">
+                    <button class="btn btn-secondary btn-block " type="Submit">Creator Profile</button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+    <div class="card" th:fragment="checkProfileTrack">
+        <div class="card-body">
+
+            <form th:action="@{/user/{id}/profile(id=${uploader.id})}" >
+
+                <div class="row">
+
+                    <div class="form-group-new row col-6">
+                        <label for="uploader" class="col-sm-4 col-form-label">Uploader</label>
+                        <input name="uploader" class="form-control-plaintext col-sm-8 font-weight-bold" readonly type="text" id="uploader"
+                               th:field="${uploader.name}" >
+                    </div>
+
+                    <div class="col-6">
+                        <button class="btn btn-secondary btn-block " type="Submit">Uploader Profile</button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</body>
+</html>
