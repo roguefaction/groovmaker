@@ -2,6 +2,7 @@ package com.example.groovmaker.controller;
 
 import com.example.groovmaker.exception.StorageFileNotFoundException;
 import com.example.groovmaker.model.Playlist;
+import com.example.groovmaker.model.Rating;
 import com.example.groovmaker.model.Track;
 import com.example.groovmaker.model.User;
 import com.example.groovmaker.service.*;
@@ -22,6 +23,9 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,18 +42,18 @@ public class TrackController {
     private HibernateSearchService searchservice;
     private CommentService commentService;
     private PlaylistService playlistService;
+    private RatingService ratingService;
 
     @Autowired
-    public TrackController(TrackService trackService, UserService userService, StorageService storageService, HibernateSearchService searchservice, CommentService commentService, PlaylistService playlistService) {
+    public TrackController(TrackService trackService, UserService userService, StorageService storageService, HibernateSearchService searchservice, CommentService commentService, PlaylistService playlistService, RatingService ratingService) {
         this.trackService = trackService;
         this.userService = userService;
         this.storageService = storageService;
         this.searchservice = searchservice;
         this.commentService = commentService;
         this.playlistService = playlistService;
+        this.ratingService = ratingService;
     }
-
-
 
     @GetMapping(value = "/track/{id}")
     public ModelAndView getTrackById(@PathVariable("id") int id) {
@@ -59,19 +63,37 @@ public class TrackController {
 
         User uploader = userService.findUserById(track.getUploader().getId());
 
-
         User user = getAuthenticatedUser();
 
+        List<Rating> trackRatings = ratingService.getTracksRating(id);
+
+        boolean hasUserRatedThisTrack = false;
+
+        for (Rating rating : trackRatings) {
+            if (rating.getRatingUser().contains(user)) {
+                hasUserRatedThisTrack = true;
+            }
+        }
+
+        boolean isCreatorAlreadyFollowed = false;
+
+        if (getAuthenticatedUser().getFollowing().contains(track.getUploader())) {
+            isCreatorAlreadyFollowed = true;
+        }
+        modelAndView.addObject("followBool", isCreatorAlreadyFollowed);
+
+        modelAndView.addObject("ratingBool", hasUserRatedThisTrack);
         modelAndView.addObject("comments", commentService.getTracksComments(id));
         modelAndView.addObject("user", user);
         modelAndView.addObject("track", track);
+        modelAndView.addObject("trackRating", ratingService.getTracksAverageRating(track.getId()));
 
         List<Playlist> playlists = playlistService.getUsersPlaylists(getAuthenticatedUser());
 
         Iterator<Playlist> iterator = playlists.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             Playlist currentPlaylist = iterator.next();
-            if(track.getInPlaylist().contains(currentPlaylist)){
+            if (track.getInPlaylist().contains(currentPlaylist)) {
                 iterator.remove();
             }
         }
@@ -84,6 +106,11 @@ public class TrackController {
     @PostMapping(value = "/track/create")
     public ModelAndView createTrack(@Valid Track track, BindingResult bindingResult, @RequestParam(value = "file") MultipartFile file) {
 
+        Instant now = Instant.now();
+        ZoneId zoneId = ZoneId.of("America/Los_Angeles");
+        ZonedDateTime dateAndTimeInLA = ZonedDateTime.ofInstant(now, zoneId);
+
+        track.setLastModified(dateAndTimeInLA);
         ModelAndView modelAndView = new ModelAndView();
 
         User user = getAuthenticatedUser();
@@ -172,6 +199,12 @@ public class TrackController {
     public ModelAndView updateTrack(@PathVariable("id") int id, @Valid Track track, BindingResult bindingResult, @RequestParam(value = "file", required = false) MultipartFile file) {
 
         User user = getAuthenticatedUser();
+
+        Instant now = Instant.now();
+        ZoneId zoneId = ZoneId.of("America/Los_Angeles");
+        ZonedDateTime dateAndTimeInLA = ZonedDateTime.ofInstant(now, zoneId);
+
+        track.setLastModified(dateAndTimeInLA);
 
         Track checkTrack = trackService.getTrackById(id);
         if (user.getId() != checkTrack.getUploaderId())

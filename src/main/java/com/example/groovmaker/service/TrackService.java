@@ -3,6 +3,7 @@ package com.example.groovmaker.service;
 import com.example.groovmaker.model.Track;
 import com.example.groovmaker.model.User;
 import com.example.groovmaker.repository.TrackRepository;
+import com.example.groovmaker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,19 +13,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TrackService {
 
     private TrackRepository trackRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    public TrackService(TrackRepository trackRepository) {
+    public TrackService(TrackRepository trackRepository, UserRepository userRepository) {
         this.trackRepository = trackRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Track> getAllTracks() {
@@ -81,6 +81,7 @@ public class TrackService {
             updatedTrack.setArtist(track.getArtist());
             updatedTrack.setDescription(track.getDescription());
             updatedTrack.setGenre(track.getGenre());
+            updatedTrack.setLastModified(track.getLastModified());
             updatedTrack.setImageUrl(track.getImageUrl());
             if (track.getFileUrl() != null)
                 updatedTrack.setFileUrl(track.getFileUrl());
@@ -154,8 +155,28 @@ public class TrackService {
 
     }
 
-    public List<Track> getAllFavorites(User user){
+    public List<Track> getAllFavorites(User user) {
         return trackRepository.findByFavoritedBy(user);
+    }
+
+
+    public List<Track> getFeed(User user) {
+
+        List<Track> tracks = new ArrayList<>();
+
+        for (User followingUser : user.getFollowing()) {
+            tracks.addAll(trackRepository.findByUploader(followingUser));
+        }
+
+        Collections.sort(tracks, new Comparator<Track>() {
+            public int compare(Track o1, Track o2) {
+                return o1.getLastModified().compareTo(o2.getLastModified());
+            }
+        });
+        Collections.reverse(tracks);
+
+        return tracks;
+
     }
 
 

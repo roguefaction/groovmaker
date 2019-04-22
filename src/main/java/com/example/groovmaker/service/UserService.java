@@ -10,4 +10,8 @@ public interface UserService {
 
     User findUserById(int id);
 
+    void followUser(User currentUser, int userIdToFollow);
+
+    void unfollowUser(User currentUser, int userIdToUnfollow);
+
 }

@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,6 +58,9 @@ public class Track implements Serializable {
     @Field
     private int uploaderId;
 
+    @Column(name = "last_modified")
+    private ZonedDateTime lastModified;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "uploader", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -82,6 +86,15 @@ public class Track implements Serializable {
             mappedBy = "tracks")
     private Set<Playlist> inPlaylist = new HashSet<>();
 
+    @JsonBackReference
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "ratingTrack")
+    private Set<Rating> rating = new HashSet<>();
+
     public Track() {
     }
 
@@ -94,6 +107,22 @@ public class Track implements Serializable {
         this.fileUrl = fileUrl;
         this.uploaderId = uploaderId;
         this.uploader = uploader;
+    }
+
+    public ZonedDateTime getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(ZonedDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public Set<Rating> getRating() {
+        return rating;
+    }
+
+    public void setRating(Set<Rating> rating) {
+        this.rating = rating;
     }
 
     public Set<User> getFavoritedBy() {

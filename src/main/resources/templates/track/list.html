@@ -66,61 +66,20 @@
                                 <th scope="col">Title</th>
                                 <th scope="col">Artist</th>
                                 <th scope="col">Genre</th>
+                                <th scope="col">Uploader</th>
                                 <th scope="col">Show</th>
-                                <th scope="col">Edit</th>
-                                <th scope="col">Delete</th>
                             </tr>
                             </thead>
-
-                            <!--<tbody>-->
-                            <!--<tr th:each="track : ${tracks}">-->
-                            <!--<th scope="row" th:text="${track.title}"></th>-->
-                            <!--<td th:text="${track.artist}"></td>-->
-                            <!--<td th:text="${track.genre}"></td>-->
-                            <!--<td>-->
-                            <!--<form th:action="@{/track/{id}/(id=${track.id})}" method="get">-->
-                            <!--<button class="btn btn-primary btn-block" type="Submit">Show</button>-->
-                            <!--</form>-->
-                            <!--</td>-->
-                            <!--<td>-->
-                            <!--<form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"-->
-                            <!--th:if="${user.getId() == track.getUploaderId()}">-->
-                            <!--<button class="btn btn-warning btn-block" type="Submit">Edit</button>-->
-                            <!--</form>-->
-                            <!--</td>-->
-                            <!--<td>-->
-                            <!--<form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}"-->
-                            <!--method="get" th:if="${user.getId() == track.getUploaderId()}">-->
-                            <!--<button class="btn btn-danger btn-block" type="Submit"-->
-                            <!--th:onclick="return confirm('Are you sure?')">Delete-->
-                            <!--</button>-->
-                            <!--</form>-->
-                            <!--</td>-->
-                            <!--</tr>-->
-                            <!--</tbody>-->
 
                             <tbody>
                             <tr th:each="track : ${tracksPage.content}">
                                 <th scope="row" th:text="${track.title}"></th>
                                 <td th:text="${track.artist}"></td>
                                 <td th:text="${track.genre}"></td>
+                                <td th:text="${track.uploader.name}"></td>
                                 <td>
                                     <form th:action="@{/track/{id}/(id=${track.id})}" method="get">
                                         <button class="btn btn-primary btn-block" type="Submit">Show</button>
-                                    </form>
-                                </td>
-                                <td>
-                                    <form th:action="@{/track/{id}/edit(id=${track.id})}" method="get"
-                                          th:if="${user.getId() == track.getUploaderId()}">
-                                        <button class="btn btn-warning btn-block" type="Submit">Edit</button>
-                                    </form>
-                                </td>
-                                <td>
-                                    <form th:action="@{/track/{id}/delete(id=${track.id})}" th:href="@{'/tracks'}"
-                                          method="get" th:if="${user.getId() == track.getUploaderId()}">
-                                        <button class="btn btn-danger btn-block" type="Submit"
-                                                th:onclick="return confirm('Are you sure?')">Delete
-                                        </button>
                                     </form>
                                 </td>
                             </tr>

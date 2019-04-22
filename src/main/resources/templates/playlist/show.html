@@ -149,5 +149,21 @@
 </div>
 <br>
 
+<div class="card container">
+    <div class="card-body row">
+
+        <nav aria-label="Page navigation example" class="container row d-flex justify-content-center">
+            <ul th:if="${tracks.totalPages > 0}" class="pagination" th:each="pageNumber : ${pageNumbers}">
+                <li class="btn btn-outline-secondary"><a class="text-secondary"
+                                                         th:href="@{/tracks(size=${tracks.size}, page=${pageNumber})}"
+                                                         th:text="${pageNumber}  "
+                                                         th:class="${pageNumber==tracks.number + 1} ? active">1</a></li>
+            </ul>
+        </nav>
+
+    </div>
+</div>
+
+
 </body>
 </html>

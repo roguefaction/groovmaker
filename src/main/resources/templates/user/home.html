@@ -27,11 +27,73 @@
 
     <h1 class="pt-3 pb-3">Welcome to GroovMaker</h1>
 
-    <p class="admin-message-text text-center" th:utext="${userMessage}"></p>
+    <h1 class="pt-3 pb-3">Here is your feed!</h1>
 
-    <form th:action="@{/track/create}" method="get">
-        <button class="btn btn-primary btn-block" type="Submit">Upload a Track</button>
-    </form>
+    <br>
+
+    <div th:if="not ${#lists.isEmpty(tracksPage.content)}" th:each="track : ${tracksPage.content}">
+
+
+        <div class="card container">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <h6 th:text="'Uploaded By: ' + ${track.uploader.name}"></h6>
+                    </div>
+                    <div class="col-6">
+                        <h6 th:text="'Uploaded On: ' + ${#temporals.format(track.lastModified, 'yyyy-MM-dd HH:mm')}"></h6>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <img th:src="${track.imageUrl}" name="imageUrl" class="img-thumbnail" id="imageUrl"
+                             th:alt="${track.imageUrl}">
+                    </div>
+                    <div class="col-8">
+                        <div class="row"><h5 th:text="'Artist: ' + ${track.artist}"></h5></div>
+                        <div class="row"><h5 th:text="'Title: ' + ${track.title}"></h5></div>
+                        <div class="row"><h5 th:text="'Genre: ' + ${track.genre}"></h5></div>
+                        <div class="row">
+                            <form th:action="@{/track/{id}/(id=${track.id})}" method="get">
+                                <button class="btn btn-primary btn-block" type="Submit">Show</button>
+                            </form>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+    </div>
+
+    <div th:if="${#lists.isEmpty(tracksPage.content)}">
+
+        <h1 class="pt-3 pb-3">Your feed is empty!</h1>
+
+    </div>
+
+    <br>
+
+    <div class="card container">
+        <div class="card-body row">
+
+            <nav aria-label="Page navigation example" class="container row d-flex justify-content-center">
+                <ul th:if="${tracksPage.totalPages > 0}" class="pagination" th:each="pageNumber : ${pageNumbers}">
+                    <li class="btn btn-outline-secondary"><a class="text-secondary"
+                                                             th:href="@{/user/home(size=${tracksPage.size}, page=${pageNumber})}"
+                                                             th:text="${pageNumber}  "
+                                                             th:class="${pageNumber==tracksPage.number + 1} ? active">1</a></li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+
 
 
 </div>

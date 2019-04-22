@@ -71,21 +71,15 @@ public class LoginController {
 
 
     @GetMapping(value = {"/", "/welcome"})
-    public ModelAndView welcome() {
-        ModelAndView modelAndView = new ModelAndView();
+    public String welcome() {
 
         User user = getAuth();
 
         if (user != null) {
-
-            modelAndView.addObject(user);
-            modelAndView.addObject("userMessage", "Content Available Only for Users with User Role");
-            modelAndView.setViewName("user/home");
-            return modelAndView;
+            return "redirect:/user/home";
         }
 
-        modelAndView.setViewName("welcome");
-        return modelAndView;
+        return "redirect:/login";
     }
 
 

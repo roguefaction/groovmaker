@@ -42,4 +42,7 @@ dependencies {
 	runtimeOnly 'mysql:mysql-connector-java'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+//	compile group: 'org.webjars', name: 'bootstrap', version: '3.2.0'
+//	compile group: 'org.webjars', name: 'jquery', version: '1.0.1'
+//	compile group: 'org.webjars', name: 'bootstrap-datepicker', version: '1.8.0'
 }

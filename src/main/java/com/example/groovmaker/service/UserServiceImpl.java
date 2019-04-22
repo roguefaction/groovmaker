@@ -1,6 +1,7 @@
 package com.example.groovmaker.service;
 
 import com.example.groovmaker.model.Role;
+import com.example.groovmaker.model.Track;
 import com.example.groovmaker.model.User;
 import com.example.groovmaker.repository.RoleRepository;
 import com.example.groovmaker.repository.UserRepository;
@@ -10,9 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,6 +20,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;  // used for raw password encoding
+
 
     @Autowired  // might need too include fields in this constructor
     public UserServiceImpl(RoleRepository roleRepository, UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -53,6 +53,41 @@ public class UserServiceImpl implements UserService {
         }
 
     }
+
+    public void followUser(User currentUser, int userIdToFollow) {
+
+        Optional<User> foundUser = userRepository.findById(userIdToFollow);
+
+        if (foundUser.isPresent()) {
+            foundUser.get().getFollowers().add(currentUser);
+            currentUser.getFollowing().add(foundUser.get());
+
+            userRepository.save(currentUser);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+
+    }
+
+    public void unfollowUser(User currentUser, int userToUnfollow) {
+
+        Optional<User> foundUser = userRepository.findById(userToUnfollow);
+
+        if (foundUser.isPresent()) {
+            User testuser = foundUser.get();
+            if (testuser.getFollowers().contains(currentUser)) {
+                testuser.getFollowers().remove(currentUser);
+                userRepository.save(testuser);
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not following this user");
+            }
+
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+    }
+
 
 
 }

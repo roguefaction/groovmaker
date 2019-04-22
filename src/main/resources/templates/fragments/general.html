@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="navbar">
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <link th:href="@{../../static/css/forms.css}" rel="stylesheet">
 </head>
 <body>
@@ -17,7 +17,7 @@
     <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/welcome}" >Welcome</a>
+                <a class="nav-link" th:href="@{/welcome}">Welcome</a>
             </li>
             <li class="nav-item ">
                 <a class="nav-link" th:href="@{/user/home}">Home</a>
@@ -44,7 +44,8 @@
             </span>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" th:utext="'My Stuff'" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                   aria-haspopup="true" th:utext="'My Stuff'" aria-expanded="false">
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <a class="nav-link" th:href="@{/user/{id}/profile(id=${user.id})}">My Profile</a>
@@ -127,7 +128,7 @@
     <div class="card">
         <article class="card-body">
 
-            <form th:object="${userProfile}" >
+            <form th:object="${userProfile}">
 
                 <div class="container row">
 
@@ -160,50 +161,83 @@
 <div class="card" th:fragment="checkProfilePlaylist">
     <div class="card-body">
 
-        <form th:action="@{/user/{id}/profile(id=${creator.id})}" >
+        <div class=" row">
 
-            <div class=" row">
-
-                <div class="form-group-new row col-6">
-                    <label for="uploader" class="col-sm-4 col-form-label">Creator</label>
-                    <input name="uploader" class="form-control-plaintext col-sm-8 font-weight-bold" readonly type="text" id="uploader"
-                           th:field="${creator.name}" >
-                </div>
-
-                <div class="col-6">
-                    <button class="btn btn-secondary btn-block " type="Submit">Creator Profile</button>
-                </div>
-
+            <div class="form-group-new row col-6">
+                <label for="uploader" class="col-sm-4 col-form-label">Creator</label>
+                <input name="uploader" class="form-control-plaintext col-sm-8 font-weight-bold" readonly type="text"
+                       id="uploader"
+                       th:field="${creator.name}">
             </div>
 
-        </form>
+            <div class="col-3">
+                <form th:action="@{/user/{id}/profile(id=${creator.id})}">
+                    <button class="btn btn-primary btn-block " type="Submit">Profile</button>
+                </form>
+            </div>
+
+            <div class="col-3">
+                <div  th:if="not ${followBool}">
+                    <form action="#" th:action="@{/follow/{id}/(id=${creator.id})}" th:method="post" >
+                        <button class="btn btn-danger btn-block " type="Submit">Follow</button>
+                    </form>
+                </div>
+
+                <div th:if="${followBool}">
+                    <form action="#" th:action="@{/unfollow/{id}/(id=${creator.id})}" th:method="post">
+                        <button class="btn btn-secondary btn-block " type="Submit">Unfollow</button>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+
 
     </div>
 </div>
 
-    <div class="card" th:fragment="checkProfileTrack">
-        <div class="card-body">
+<div class="card" th:fragment="checkProfileTrack">
+    <div class="card-body">
 
-            <form th:action="@{/user/{id}/profile(id=${uploader.id})}" >
 
-                <div class="row">
+        <div class="row">
 
-                    <div class="form-group-new row col-6">
-                        <label for="uploader" class="col-sm-4 col-form-label">Uploader</label>
-                        <input name="uploader" class="form-control-plaintext col-sm-8 font-weight-bold" readonly type="text" id="uploader"
-                               th:field="${uploader.name}" >
-                    </div>
+            <div class="form-group-new row col-6">
+                <label for="uploader" class="col-sm-4 col-form-label">Uploader</label>
+                <input name="uploader" class="form-control-plaintext col-sm-8 font-weight-bold" readonly type="text"
+                       id="uploader"
+                       th:field="${uploader.name}">
+            </div>
 
-                    <div class="col-6">
-                        <button class="btn btn-secondary btn-block " type="Submit">Uploader Profile</button>
-                    </div>
+            <div class="col-3">
+                <form th:action="@{/user/{id}/profile(id=${uploader.id})}" >
+                    <button class="btn btn-primary btn-block " type="Submit">Profile</button>
+                </form>
+            </div>
 
+            <div class="col-3">
+                <div th:if="not ${followBool}">
+                    <form action="#" th:action="@{/follow/{id}/(id=${uploader.id})}" th:method="post" >
+                        <button class="btn btn-danger btn-block " type="Submit">Follow</button>
+
+                    </form>
                 </div>
 
-            </form>
+                <div th:if="${followBool}">
+                    <form action="#" th:action="@{/unfollow/{id}/(id=${uploader.id})}" th:method="post">
+
+                        <button class="btn btn-secondary btn-block " type="Submit">Unfollow</button>
+
+                    </form>
+                </div>
+            </div>
 
         </div>
+
+
     </div>
+</div>
 
 </body>
 </html>

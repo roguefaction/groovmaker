@@ -49,6 +49,44 @@ public class User {
             mappedBy = "favoritedBy")
     private Set<Track> favoriteTracks = new HashSet<>();
 
+    @JsonBackReference
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "ratingUser")
+    private Set<Rating> trackRatings = new HashSet<>();
+
+//    @ManyToMany(fetch = FetchType.LAZY,
+//            cascade = {
+//                    CascadeType.PERSIST,
+//                    CascadeType.MERGE
+//            })
+//    @JoinTable(name = "followed_user",
+//            joinColumns = {@JoinColumn(name = "user_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "followed_user_id")})
+//    private Set<User> followedUsers = new HashSet<>();
+//
+//    @JsonBackReference
+//    @ManyToMany(fetch = FetchType.LAZY,
+//            cascade = {
+//                    CascadeType.PERSIST,
+//                    CascadeType.MERGE
+//            },
+//            mappedBy = "followedUsers")
+//    private Set<Rating> followingUsers = new HashSet<>();
+
+    @ManyToMany(cascade={CascadeType.ALL})
+    @JoinTable(name="user_follower",
+            joinColumns={@JoinColumn(name="user_id")},
+            inverseJoinColumns={@JoinColumn(name="follower_id")})
+    private Set<User> followers = new HashSet<>();
+
+    @JsonBackReference
+    @ManyToMany(mappedBy="followers")
+    private Set<User> following = new HashSet<>();
+
     public User(@Email(message = "Please enter a valid email address") @NotEmpty(message = "Please enter an email address") String email, @NotEmpty(message = "Please enter your name") String name, @NotEmpty(message = "Please enter a valid password") @Length(min = 5, message = "Your password must be atleast 5 characters long") String password, Set<Role> roles) {
         this.email = email;
         this.name = name;
@@ -59,8 +97,48 @@ public class User {
     public User() {
     }
 
+    public Set<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<User> followers) {
+        this.followers = followers;
+    }
+
+    public Set<User> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<User> following) {
+        this.following = following;
+    }
+
+    //    public Set<User> getFollowedUsers() {
+//        return followedUsers;
+//    }
+//
+//    public void setFollowedUsers(Set<User> followedUsers) {
+//        this.followedUsers = followedUsers;
+//    }
+//
+//    public Set<Rating> getFollowingUsers() {
+//        return followingUsers;
+//    }
+//
+//    public void setFollowingUsers(Set<Rating> followingUsers) {
+//        this.followingUsers = followingUsers;
+//    }
+
     public Set<Track> getFavoriteTracks() {
         return favoriteTracks;
+    }
+
+    public Set<Rating> getTrackRatings() {
+        return trackRatings;
+    }
+
+    public void setTrackRatings(Set<Rating> trackRatings) {
+        this.trackRatings = trackRatings;
     }
 
     public void setFavoriteTracks(Set<Track> favoriteTracks) {

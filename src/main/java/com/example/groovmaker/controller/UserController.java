@@ -35,11 +35,27 @@ public class UserController {
     }
 
     @GetMapping(value = "/user/home")
-    public ModelAndView home() {
+    public ModelAndView home(@RequestParam("page") Optional<Integer> page,
+                             @RequestParam("size") Optional<Integer> size) {
         ModelAndView modelAndView = new ModelAndView();
 
         // get current users name from auth object
         User user = getAuthenticatedUser();
+
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(6);
+
+        Page<Track> trackPage = trackService.findPaginatedTracks(PageRequest.of(currentPage - 1, pageSize), trackService.getFeed(user));
+        modelAndView.addObject("tracksPage", trackPage);
+
+
+        int totalPages = trackPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            modelAndView.addObject("pageNumbers", pageNumbers);
+        }
 
         // welcome objects added to displaying page
         modelAndView.addObject(user);
@@ -85,6 +101,8 @@ public class UserController {
         modelAndView.setViewName("user/profile");
         return modelAndView;
     }
+
+
 
 
     private User getAuthenticatedUser() {

@@ -41,14 +41,14 @@ public class PlaylistController {
     }
 
     @PostMapping(value = "/track/{id}/addtoplaylist")
-    private String addTrackToPlaylist(@PathVariable("id") int id, @RequestParam("playlist") int playlist,  HttpServletRequest request){
+    private String addTrackToPlaylist(@PathVariable("id") int id, @RequestParam("playlist") int playlist, HttpServletRequest request) {
 
         playlistService.addTrackToPlaylist(id, playlist);
         return "redirect:" + request.getContextPath();
     }
 
     @PostMapping(value = "/track/{id}/removefromplaylist/{playlistId}")
-    private String removeTrackFromPlaylist(@PathVariable("id") int id, @PathVariable("playlistId") int playlistId,  HttpServletRequest request){
+    private String removeTrackFromPlaylist(@PathVariable("id") int id, @PathVariable("playlistId") int playlistId, HttpServletRequest request) {
 
         playlistService.removeTrackFromPlaylist(id, playlistId);
         return "redirect:/playlist/" + playlistId;
@@ -67,12 +67,20 @@ public class PlaylistController {
 
         Playlist currentPlaylist = playlistService.getPlaylistById(id);
 
+        boolean isCreatorAlreadyFollowed = false;
+
+        if (getAuthenticatedUser().getFollowing().contains(currentPlaylist.getCreator())) {
+            isCreatorAlreadyFollowed = true;
+        }
+        currentView.addObject("followBool", isCreatorAlreadyFollowed);
+
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(6);
 
         Page<Track> tracksPaginated = trackService.findPaginatedTracks(PageRequest.of(currentPage - 1, pageSize), playlistService.getPlaylistsTracks(currentPlaylist));
         currentView.addObject("tracks", tracksPaginated);
         currentView = ControllerHelper.addPaginatedViews(currentView, tracksPaginated);
+
 
         currentView.addObject("playlist", currentPlaylist);
         currentView.addObject("creator", currentPlaylist.getCreator());
